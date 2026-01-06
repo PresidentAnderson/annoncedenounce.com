@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>annoncedenounce.com - Coming Soon</title>
     <link rel="canonical" href="https://annoncedenounce.com">
+    <script charset="utf-8" type="text/javascript" src="//js.hsforms.net/forms/embed/v2.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -18,22 +19,44 @@
             text-align: center;
             padding: 20px;
         }
-        .container { max-width: 600px; }
-        h1 { font-size: 2.5rem; margin-bottom: 1rem; background: linear-gradient(90deg, #e94560, #ff6b6b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .domain { font-size: 1rem; color: #e94560; margin-bottom: 1rem; letter-spacing: 2px; text-transform: uppercase; }
+        .container { max-width: 500px; width: 100%; }
+        h1 { font-size: 2.5rem; margin-bottom: 0.5rem; background: linear-gradient(90deg, #e94560, #ff6b6b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .domain { font-size: 0.9rem; color: #e94560; margin-bottom: 1rem; letter-spacing: 2px; text-transform: uppercase; }
         p { font-size: 1.1rem; color: #a0a0a0; margin-bottom: 2rem; line-height: 1.6; }
-        .cta {
-            display: inline-block;
-            padding: 15px 40px;
+        .form-container { 
+            background: rgba(255,255,255,0.05); 
+            padding: 30px; 
+            border-radius: 15px; 
+            backdrop-filter: blur(10px);
+            margin-bottom: 2rem;
+        }
+        .form-container input[type="email"] {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            margin-bottom: 15px;
+        }
+        .form-container button {
+            width: 100%;
+            padding: 15px;
             background: linear-gradient(90deg, #e94560, #ff6b6b);
             color: white;
-            text-decoration: none;
-            border-radius: 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
             font-weight: 600;
+            cursor: pointer;
             transition: transform 0.3s, box-shadow 0.3s;
         }
-        .cta:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(233, 69, 96, 0.4); }
-        .footer { margin-top: 3rem; font-size: 0.85rem; color: #555; }
+        .form-container button:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(233, 69, 96, 0.4); }
+        .footer { margin-top: 2rem; font-size: 0.85rem; color: #555; }
+        .hs-form input { width: 100% !important; padding: 15px !important; border-radius: 8px !important; border: none !important; margin-bottom: 10px !important; }
+        .hs-form .hs-button { width: 100% !important; padding: 15px !important; background: linear-gradient(90deg, #e94560, #ff6b6b) !important; border: none !important; border-radius: 8px !important; font-weight: 600 !important; }
+        .hs-form label { color: #a0a0a0 !important; text-align: left !important; display: block !important; margin-bottom: 5px !important; }
+        .hs-error-msgs { color: #ff6b6b !important; }
+        .submitted-message { color: #4ade80 !important; font-size: 1.2rem !important; }
     </style>
 </head>
 <body>
@@ -41,8 +64,24 @@
         <div class="domain">annoncedenounce.com</div>
         <h1>Coming Soon</h1>
         <p>We're crafting something extraordinary. Be the first to experience it.</p>
-        <a href="mailto:hello@axai-innovations.com?subject=Interested in annoncedenounce.com" class="cta">Get Notified</a>
+        <div class="form-container">
+            <div id="hubspot-form"></div>
+        </div>
         <div class="footer">© 2026 AXAI Innovations · All rights reserved</div>
     </div>
+    <script>
+        hbspt.forms.create({
+            portalId: "43986063",
+            formId: "waitlist-annoncedenouncecom",
+            region: "na1",
+            target: "#hubspot-form",
+            onFormSubmit: function() {
+                console.log("Form submitted for annoncedenounce.com");
+            },
+            fallback: function() {
+                document.getElementById('hubspot-form').innerHTML = '<form action="https://forms.hubspot.com/uploads/form/v2/43986063/contact" method="POST"><input type="email" name="email" placeholder="Enter your email" required style="width:100%;padding:15px;border:none;border-radius:8px;margin-bottom:15px;"><input type="hidden" name="domain" value="annoncedenounce.com"><button type="submit" style="width:100%;padding:15px;background:linear-gradient(90deg,#e94560,#ff6b6b);color:white;border:none;border-radius:8px;font-weight:600;cursor:pointer;">Get Notified</button></form>';
+            }
+        });
+    </script>
 </body>
 </html>
