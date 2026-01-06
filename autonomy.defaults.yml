@@ -1,0 +1,327 @@
+# Sovereign Autonomy Pack - Default Configuration
+# Version: 1.0.0
+
+# Global Settings
+name: "Sovereign Autonomy Pack"
+version: "1.0.0"
+description: "Autonomous development workflow with AI agents"
+
+# Security Settings
+security:
+  max_issues_default: 1
+  max_issues_maximum: 10
+  allow_continuous: false
+  continuous_override_flag: "--allow-continuous"
+  emergency_stop_file: ".agent-workspace/STOP"
+  
+  # Required permissions for GitHub tokens
+  required_permissions:
+    contents: write
+    issues: write
+    pull-requests: write
+    metadata: read
+  
+  # Forbidden permissions (security boundary)
+  forbidden_permissions:
+    - secrets
+    - admin
+    - organization
+    - actions
+
+# Agent Configuration
+agents:
+  codex:
+    description: "General purpose, reliable autonomous agent"
+    specialties: ["feature-implementation", "bug-fixes", "general-development"]
+    default_priority: "high"
+    
+  claude:
+    description: "Strategic thinking and documentation agent"
+    specialties: ["architecture", "documentation", "complex-problems"]
+    default_priority: "medium"
+    
+  copilot:
+    description: "Code-focused pattern recognition agent" 
+    specialties: ["refactoring", "optimization", "code-quality"]
+    default_priority: "medium"
+    
+  sparks:
+    description: "Innovation and experimentation agent"
+    specialties: ["new-features", "creative-solutions", "prototyping"]
+    default_priority: "low"
+
+# Issue Processing Rules
+issue_processing:
+  # Eligibility requirements
+  eligibility:
+    required_labels:
+      - prefix: "priority:"
+        values: ["critical", "high", "medium", "low"]
+    required_sections:
+      - "## Acceptance Criteria"
+    states:
+      - "open"
+  
+  # Priority processing order
+  priority_order:
+    - "priority:critical"
+    - "priority:high" 
+    - "priority:medium"
+    - "priority:low"
+  
+  # Processing limits
+  limits:
+    max_concurrent_issues: 1
+    max_processing_time_minutes: 60
+    max_retries: 3
+
+# GitHub Integration
+github:
+  # Required labels (created during installation)
+  labels:
+    priority:
+      critical: 
+        color: "ff0000"
+        description: "Critical priority issue requiring immediate attention"
+      high:
+        color: "ff8800" 
+        description: "High priority issue"
+      medium:
+        color: "ffaa00"
+        description: "Medium priority issue"
+      low:
+        color: "ffdd00"
+        description: "Low priority issue"
+    
+    status:
+      pr-created:
+        color: "00ff00"
+        description: "Issue has been processed and PR created by autonomous agent"
+      agent-assigned:
+        color: "0088ff"
+        description: "Issue assigned to autonomous agent"
+    
+    agent:
+      handoff:
+        color: "8800ff"
+        description: "Agent handoff to Claude for review"
+      validated:
+        color: "00ff88"
+        description: "Autonomous PR passed validation"
+    
+    review:
+      claude-required:
+        color: "ff0088"
+        description: "Claude review required for merge"
+    
+    security:
+      review-required:
+        color: "aa0000"
+        description: "Security review required"
+      cleared:
+        color: "00aa00"
+        description: "Security review completed and cleared"
+
+  # Branch naming convention
+  branch_naming:
+    pattern: "agent/{agent_name}/{issue_number}-{slug}"
+    agents: ["codex", "claude", "copilot", "sparks"]
+    slug_max_length: 30
+
+# Workflow Configuration
+workflows:
+  autonomous_agent:
+    file: "autonomous-agent-loop.yml"
+    triggers:
+      - workflow_dispatch
+      - issues_labeled
+      - pull_request_merged
+    
+    defaults:
+      node_version: "20"
+      timeout_minutes: 60
+      max_issues: 1
+      agent_name: "codex"
+    
+    environment:
+      variables:
+        AGENT_EMAIL_DOMAIN: "sovereign-agents.local"
+        IMPLEMENTATION_PREFIX: "IMPLEMENTATION_"
+        SESSION_PREFIX: "AUTONOMOUS_SESSION_"
+  
+  pr_review_gate:
+    file: "autonomy-pr-review-gate.yml"
+    triggers:
+      - pull_request_opened
+      - pull_request_edited
+      - pull_request_synchronize
+    
+    validation_rules:
+      branch_pattern: "^agent/(codex|claude|copilot|sparks)/[0-9]+-[a-z0-9-]+$"
+      required_sections:
+        - "Agent Handoff Protocol"
+        - "Review Checklist"
+      required_mentions:
+        - "@claude-code"
+      required_references:
+        - "Closes #[0-9]+"
+
+# Installation Configuration
+installation:
+  # Files to install
+  files:
+    workflows:
+      - "autonomous-agent-loop.yml"
+      - "autonomy-pr-review-gate.yml"
+    
+    scripts:
+      - "install.sh"
+      - "uninstall.sh"
+      - "verify.sh"
+      - "sync.sh"
+    
+    documentation:
+      - "AUTONOMY.md"
+      - "OPERATIONS_RUNBOOK.md"
+      - "SECURITY_MODEL.md"
+    
+    integration:
+      - "Makefile.autonomy"
+  
+  # Installation markers
+  markers:
+    version_file: ".sovereign/autonomy/VERSION"
+    install_log: ".sovereign/autonomy/INSTALL_LOG.md"
+    sync_log: ".sovereign/autonomy/SYNC_LOG.md"
+    backup_dir: ".sovereign/autonomy/backups"
+
+# Monitoring and Metrics
+monitoring:
+  # Key metrics to track
+  metrics:
+    - "issues_processed_per_day"
+    - "pr_success_rate"
+    - "security_scan_failures"
+    - "manual_intervention_rate"
+    - "processing_time_per_issue"
+  
+  # Alerting thresholds
+  alerts:
+    security_scan_failures: 1
+    emergency_stops: 1
+    authentication_failures: 5
+    rate_limit_usage: 80
+  
+  # Health check requirements
+  health_checks:
+    - "github_cli_authenticated"
+    - "required_labels_present"
+    - "workflows_executable"
+    - "agent_instructions_available"
+    - "permissions_valid"
+
+# Compliance and Governance
+governance:
+  # Required approvals
+  approvals:
+    security_changes: ["security-team", "@claude-code"]
+    workflow_changes: ["platform-team", "@claude-code"]
+    configuration_changes: ["president"]
+  
+  # Audit requirements
+  audit:
+    log_retention_days: 90
+    session_summary_required: true
+    security_scan_required: true
+    human_review_required: true
+  
+  # Policy enforcement
+  policies:
+    no_hardcoded_secrets: true
+    branch_protection_required: true
+    signed_commits_preferred: true
+    dependency_scanning: true
+
+# Organization Deployment
+organization:
+  # Deployment strategy
+  deployment:
+    strategy: "gradual"
+    batch_size: 10
+    pause_between_batches_minutes: 5
+    failure_threshold_percent: 10
+  
+  # Repository filters
+  filters:
+    include_archived: false
+    include_disabled: false
+    include_private: true
+    exclude_forks: false
+  
+  # Rollout controls
+  rollout:
+    pilot_repositories: []
+    canary_percentage: 10
+    full_rollout_after_days: 7
+
+# Maintenance and Updates
+maintenance:
+  # Update schedule
+  updates:
+    check_frequency: "weekly"
+    auto_update_enabled: false
+    backup_before_update: true
+    rollback_timeout_minutes: 30
+  
+  # Cleanup policies
+  cleanup:
+    old_sessions_after_days: 30
+    old_backups_after_days: 90
+    old_logs_after_days: 60
+    temp_files_after_hours: 24
+
+# Development and Testing
+development:
+  # Test configuration
+  testing:
+    dry_run_default: false
+    test_repository: "sovereign-canon"
+    test_agent: "codex"
+    test_max_issues: 1
+  
+  # Debug settings
+  debug:
+    verbose_logging: false
+    preserve_workspace: false
+    extended_timeouts: false
+    security_scan_bypass: false
+
+# Version and Compatibility
+compatibility:
+  minimum_versions:
+    github_cli: "2.0.0"
+    git: "2.20.0"
+    bash: "4.0"
+    node: "18.0.0"
+  
+  supported_platforms:
+    - "ubuntu-latest"
+    - "ubuntu-22.04"
+    - "ubuntu-20.04"
+  
+  # Breaking changes
+  breaking_changes:
+    "1.0.0": "Initial release"
+
+# Legal and Compliance
+legal:
+  license: "MIT"
+  copyright: "© 2026 Sovereign Operating System"
+  attribution_required: true
+  commercial_use: true
+  liability_disclaimer: true
+
+---
+# Configuration file for Sovereign Autonomy Pack
+# Do not modify this file directly in production
+# Use sync.sh or install.sh to update configurations

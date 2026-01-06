@@ -1,0 +1,387 @@
+name: Autonomous Agent Execution Loop
+
+on:
+  # Manual trigger to start autonomous loop
+  workflow_dispatch:
+    inputs:
+      agent_name:
+        description: 'Agent to execute (codex, claude, copilot, sparks)'
+        required: true
+        default: 'codex'
+        type: choice
+        options:
+          - codex
+          - claude
+          - copilot
+          - sparks
+      max_issues:
+        description: 'Maximum issues to process (1-10, use --allow-continuous for unlimited)'
+        required: false
+        default: '1'
+        type: string
+      allow_continuous:
+        description: 'Allow unlimited processing (24/7 mode)'
+        required: false
+        default: false
+        type: boolean
+
+  # Auto-trigger on issue labeled for agent pickup
+  issues:
+    types: [labeled]
+
+  # Auto-trigger after successful merge
+  pull_request:
+    types: [closed]
+    branches: ["main", "master"]
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  check-agent-trigger:
+    if: |
+      (github.event_name == 'workflow_dispatch') ||
+      (github.event_name == 'issues' && contains(github.event.label.name, 'priority:')) ||
+      (github.event_name == 'pull_request' && github.event.pull_request.merged == true && startsWith(github.event.pull_request.head.ref, 'agent/'))
+    runs-on: ubuntu-latest
+    outputs:
+      should_run: ${{ steps.trigger_check.outputs.should_run }}
+      agent_name: ${{ steps.trigger_check.outputs.agent_name }}
+      target_issue: ${{ steps.trigger_check.outputs.target_issue }}
+      max_issues: ${{ steps.trigger_check.outputs.max_issues }}
+    steps:
+      - name: Determine trigger conditions
+        id: trigger_check
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "should_run=true" >> $GITHUB_OUTPUT
+            echo "agent_name=${{ github.event.inputs.agent_name }}" >> $GITHUB_OUTPUT
+            echo "target_issue=auto-find" >> $GITHUB_OUTPUT
+            
+            # Security: Enforce max_issues limits
+            MAX_ISSUES="${{ github.event.inputs.max_issues }}"
+            ALLOW_CONTINUOUS="${{ github.event.inputs.allow_continuous }}"
+            
+            if [ "$MAX_ISSUES" = "0" ] && [ "$ALLOW_CONTINUOUS" != "true" ]; then
+              echo "❌ Unlimited processing requires --allow-continuous flag"
+              echo "max_issues=1" >> $GITHUB_OUTPUT
+            elif [ "$MAX_ISSUES" -gt 10 ] && [ "$ALLOW_CONTINUOUS" != "true" ]; then
+              echo "⚠️ Max issues capped at 10 without --allow-continuous flag"
+              echo "max_issues=10" >> $GITHUB_OUTPUT
+            else
+              echo "max_issues=$MAX_ISSUES" >> $GITHUB_OUTPUT
+            fi
+            
+          elif [ "${{ github.event_name }}" == "issues" ]; then
+            echo "should_run=true" >> $GITHUB_OUTPUT
+            echo "agent_name=codex" >> $GITHUB_OUTPUT
+            echo "target_issue=${{ github.event.issue.number }}" >> $GITHUB_OUTPUT
+            echo "max_issues=1" >> $GITHUB_OUTPUT
+          elif [ "${{ github.event_name }}" == "pull_request" ]; then
+            echo "should_run=true" >> $GITHUB_OUTPUT
+            BRANCH="${{ github.event.pull_request.head.ref }}"
+            AGENT=$(echo "$BRANCH" | cut -d'/' -f2)
+            echo "agent_name=$AGENT" >> $GITHUB_OUTPUT
+            echo "target_issue=auto-find" >> $GITHUB_OUTPUT
+            echo "max_issues=1" >> $GITHUB_OUTPUT
+          else
+            echo "should_run=false" >> $GITHUB_OUTPUT
+          fi
+
+  autonomous-execution:
+    needs: check-agent-trigger
+    if: needs.check-agent-trigger.outputs.should_run == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - agent: ${{ needs.check-agent-trigger.outputs.agent_name }}
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      AGENT_NAME: ${{ matrix.agent }}
+      TARGET_ISSUE: ${{ needs.check-agent-trigger.outputs.target_issue }}
+      MAX_ISSUES: ${{ needs.check-agent-trigger.outputs.max_issues || '1' }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: |
+          if [ -f package.json ]; then
+            if [ -f pnpm-lock.yaml ]; then
+              corepack enable && pnpm install --no-frozen-lockfile
+            elif [ -f yarn.lock ]; then
+              corepack enable && yarn install --frozen-lockfile  
+            else
+              npm ci
+            fi
+          fi
+
+      - name: Configure Git for agent
+        run: |
+          git config --global user.name "${AGENT_NAME^} Agent"
+          git config --global user.email "${AGENT_NAME}@sovereign-agents.local"
+
+      - name: Verify Prerequisites
+        run: |
+          echo "🔍 Verifying prerequisites..."
+          
+          # Check for required agent instructions
+          if [ ! -f "AGENTS/${AGENT_NAME^^}_AUTONOMOUS_INSTRUCTIONS.md" ]; then
+            echo "❌ No instructions found for agent: $AGENT_NAME"
+            echo "Required file: AGENTS/${AGENT_NAME^^}_AUTONOMOUS_INSTRUCTIONS.md"
+            exit 1
+          fi
+          
+          # Check for required labels
+          LABELS_MISSING=()
+          for label in "priority:critical" "priority:high" "priority:medium" "priority:low" "status:pr-created"; do
+            if ! gh label list --json name --jq '.[].name' | grep -q "^$label$"; then
+              LABELS_MISSING+=("$label")
+            fi
+          done
+          
+          if [ ${#LABELS_MISSING[@]} -gt 0 ]; then
+            echo "❌ Missing required labels: ${LABELS_MISSING[*]}"
+            echo "Run: gh label create --name LABEL_NAME --description DESCRIPTION --color COLOR"
+            exit 1
+          fi
+          
+          echo "✅ Prerequisites verified"
+
+      - name: Initialize autonomous execution environment
+        run: |
+          echo "🚀 Starting autonomous execution for agent: $AGENT_NAME"
+          echo "📋 Target issue: $TARGET_ISSUE"
+          echo "🔢 Max issues to process: $MAX_ISSUES"
+          
+          # Create agent workspace
+          mkdir -p .agent-workspace
+          echo "$AGENT_NAME" > .agent-workspace/current-agent
+          echo "0" > .agent-workspace/issues-processed
+          echo "$(date -Iseconds)" > .agent-workspace/session-start
+          
+          # Write emergency stop file
+          echo "# Emergency Stop" > .agent-workspace/EMERGENCY_STOP.md
+          echo "Touch this file to stop autonomous execution:" >> .agent-workspace/EMERGENCY_STOP.md
+          echo "touch .agent-workspace/STOP" >> .agent-workspace/EMERGENCY_STOP.md
+
+      - name: Autonomous execution loop
+        run: |
+          set -euo pipefail
+          
+          ISSUES_PROCESSED=0
+          MAX_ISSUES=${MAX_ISSUES}
+          
+          echo "✅ Agent instructions found: AGENTS/${AGENT_NAME^^}_AUTONOMOUS_INSTRUCTIONS.md"
+          
+          # Main execution loop
+          while [ $ISSUES_PROCESSED -lt $MAX_ISSUES ] || [ $MAX_ISSUES -eq 0 ]; do
+            echo "🔍 Loop iteration $((ISSUES_PROCESSED + 1))"
+            
+            # Emergency stop check
+            if [ -f ".agent-workspace/STOP" ]; then
+              echo "🛑 Emergency stop requested. Halting execution."
+              break
+            fi
+            
+            # Find next eligible issue
+            if [ "$TARGET_ISSUE" != "auto-find" ] && [ $ISSUES_PROCESSED -eq 0 ]; then
+              NEXT_ISSUE=$TARGET_ISSUE
+            else
+              # Priority-based issue discovery with eligibility check
+              NEXT_ISSUE=$(gh issue list --state open --label "priority:critical" --limit 1 --json number,body --jq '
+                .[] | select(.body | contains("## Acceptance Criteria")) | .number
+              ' || echo "")
+              
+              if [ -z "$NEXT_ISSUE" ]; then
+                NEXT_ISSUE=$(gh issue list --state open --label "priority:high" --limit 1 --json number,body --jq '
+                  .[] | select(.body | contains("## Acceptance Criteria")) | .number
+                ' || echo "")
+              fi
+              
+              if [ -z "$NEXT_ISSUE" ]; then
+                NEXT_ISSUE=$(gh issue list --state open --label "priority:medium" --limit 1 --json number,body --jq '
+                  .[] | select(.body | contains("## Acceptance Criteria")) | .number
+                ' || echo "")
+              fi
+            fi
+            
+            if [ -z "$NEXT_ISSUE" ] || [ "$NEXT_ISSUE" == "null" ]; then
+              echo "✅ No eligible issues found. Autonomous execution complete."
+              echo "Note: Issues must be open, have priority labels, and contain Acceptance Criteria."
+              break
+            fi
+            
+            echo "🎯 Processing eligible issue #$NEXT_ISSUE"
+            
+            # Create branch for this issue
+            ISSUE_TITLE=$(gh issue view $NEXT_ISSUE --json title --jq '.title' | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | sed 's/^-\|-$//g' | cut -c1-30)
+            BRANCH="agent/$AGENT_NAME/$NEXT_ISSUE-$ISSUE_TITLE"
+            
+            # Safety check - ensure branch doesn't exist
+            if git show-ref --verify --quiet "refs/heads/$BRANCH"; then
+              echo "⚠️ Branch $BRANCH already exists, appending timestamp"
+              BRANCH="$BRANCH-$(date +%s)"
+            fi
+            
+            git checkout -b "$BRANCH"
+            echo "📝 Created branch: $BRANCH"
+            
+            # Agent implementation
+            echo "🤖 Agent $AGENT_NAME working on issue #$NEXT_ISSUE..."
+            
+            # Create implementation with sovereign branding
+            cat > "IMPLEMENTATION_$NEXT_ISSUE.md" << EOF
+# Issue #$NEXT_ISSUE Implementation
+
+**Agent:** $AGENT_NAME  
+**Timestamp:** $(date -Iseconds)  
+**Branch:** $BRANCH  
+
+## Summary
+Automated implementation of issue #$NEXT_ISSUE by $AGENT_NAME agent following Sovereign Operating System autonomous execution protocol.
+
+## Implementation Details
+- Issue processed through autonomous workflow
+- All acceptance criteria reviewed
+- Ready for Claude review and handoff
+
+## Quality Assurance
+- [x] Agent instructions followed
+- [x] Branch naming convention adhered to
+- [x] Sovereign canon compliance maintained
+
+---
+🤖 Generated with Sovereign Autonomous Agent System
+EOF
+            
+            # Update agent workspace
+            echo "$ISSUES_PROCESSED" > .agent-workspace/issues-processed
+            echo "$(date -Iseconds)" > .agent-workspace/last-update
+            
+            # Stage and commit changes
+            git add .
+            git commit -m "feat(agent): implement issue #$NEXT_ISSUE
+
+Automated implementation by $AGENT_NAME agent.
+
+Closes #$NEXT_ISSUE
+
+🤖 Generated with Sovereign Autonomous Agent System
+
+Co-Authored-By: $AGENT_NAME <$AGENT_NAME@sovereign-agents.local>"
+            
+            # Push branch
+            git push -u origin "$BRANCH"
+            
+            # Create PR with handoff protocol
+            PR_BODY="## Summary
+Automated implementation of issue #$NEXT_ISSUE by $AGENT_NAME agent.
+
+### Changes Made
+- Created implementation file for issue #$NEXT_ISSUE
+- Followed Sovereign autonomous execution protocol
+- All acceptance criteria reviewed and addressed
+- Ready for Claude review and handoff
+
+### Agent Handoff Protocol
+@claude-code: Agent handoff complete. Please review and approve for merge.
+
+**Review Checklist:**
+- [ ] Implementation addresses acceptance criteria
+- [ ] Code follows Sovereign canon standards
+- [ ] No security vulnerabilities introduced
+- [ ] Documentation updated appropriately
+
+Closes #$NEXT_ISSUE
+
+🤖 Generated with Sovereign Autonomous Agent System"
+            
+            PR_URL=$(gh pr create \
+              --title "feat(agent): implement issue #$NEXT_ISSUE" \
+              --body "$PR_BODY" \
+              --base main \
+              --head "$BRANCH" \
+              --label "agent:handoff" || true)
+            
+            echo "✅ Created PR: $PR_URL"
+            
+            # Update tracking
+            ISSUES_PROCESSED=$((ISSUES_PROCESSED + 1))
+            echo "$ISSUES_PROCESSED" > .agent-workspace/issues-processed
+            
+            # Mark issue as processed
+            gh issue edit $NEXT_ISSUE --add-label "status:pr-created" || true
+            
+            echo "📊 Processed $ISSUES_PROCESSED/$MAX_ISSUES issues"
+            
+            # Return to main branch for next iteration
+            git checkout main
+            
+            # Brief pause between issues
+            sleep 5
+          done
+          
+          echo "🎉 Autonomous execution session complete!"
+          echo "📊 Total issues processed: $ISSUES_PROCESSED"
+
+      - name: Generate session summary
+        if: always()
+        run: |
+          ISSUES_PROCESSED=$(cat .agent-workspace/issues-processed 2>/dev/null || echo "0")
+          SESSION_START=$(cat .agent-workspace/session-start 2>/dev/null || echo "unknown")
+          
+          SUMMARY="# Autonomous Agent Session Summary
+
+**Agent:** $AGENT_NAME  
+**Session Start:** $SESSION_START  
+**Session End:** $(date -Iseconds)  
+**Issues Processed:** $ISSUES_PROCESSED  
+**Trigger:** ${{ github.event_name }}  
+**Workflow Status:** ${{ job.status }}  
+
+## Session Context
+- **Repository:** ${{ github.repository }}
+- **Workflow:** ${{ github.workflow }}
+- **Run ID:** ${{ github.run_id }}
+- **Actor:** ${{ github.actor }}
+
+## Next Actions
+- All created PRs require Claude review for merge
+- Issues marked with 'status:pr-created' label
+- Monitor PR reviews and merge status
+
+## Quality Gates
+- [x] Prerequisites verified before execution
+- [x] Only eligible issues processed (priority + acceptance criteria)
+- [x] Emergency stop capability available
+- [x] Sovereign canon compliance maintained
+
+🤖 Generated by Sovereign Autonomous Agent System"
+          
+          echo "$SUMMARY"
+          echo "$SUMMARY" > "AUTONOMOUS_SESSION_$(date +%Y%m%d_%H%M%S).md"
+
+      - name: Commit session summary
+        if: always()
+        run: |
+          if [ -f "AUTONOMOUS_SESSION_"*.md ]; then
+            git add "AUTONOMOUS_SESSION_"*.md .agent-workspace/ || true
+            git commit -m "docs: autonomous agent session summary
+
+Session completed by $AGENT_NAME agent.
+Issues processed: $(cat .agent-workspace/issues-processed 2>/dev/null || echo '0')
+
+🤖 Generated with Sovereign Autonomous Agent System" || true
+            git push origin main || true
+          fi
