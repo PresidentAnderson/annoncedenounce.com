@@ -1,0 +1,29 @@
+product_repo: annoncedenounce.com
+product_owner: AXAI Innovations
+region: Quebec, CA
+primary_language: fr
+secondary_language: en
+imported_date: 2026-06-20
+operating_canon:
+  source: Sovereign Autonomy Pack
+  local_reference: /Users/presidentanderson/Documents/Claude/Projects/Sovereign Operating System/sovereign-autonomy-pack
+  version: 1.0.0
+  applied_controls:
+    - issue-driven autonomous delivery
+    - agent PR review gate
+    - priority labels and acceptance criteria
+    - human review required for legal, evidence, moderation, and auth changes
+reference_repos:
+  - repo: juge.ca
+    local_reference: /Users/presidentanderson/Documents/Claude/Projects/juge.ca
+    borrowed_patterns:
+      - CI gate before release
+      - canonical version metadata
+      - manual version bump workflow
+      - release verification before tagging
+planning_source:
+  attachment: /Users/presidentanderson/.codex/attachments/cc6dd616-72fa-4d15-989c-c8bc497b09ef/pasted-text.txt
+  title: Annonce Denonce Full Site Development Plan
+notes:
+  - Static-site controls are intentionally lighter than juge.ca Next.js controls.
+  - Product-specific legal review controls supersede generic autonomy behavior for publication, moderation, evidence, privacy, and right-of-reply work.

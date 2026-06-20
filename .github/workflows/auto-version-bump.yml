@@ -1,0 +1,75 @@
+name: Auto Version Bump
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: "Semantic version bump"
+        required: true
+        default: "patch"
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+
+concurrency:
+  group: auto-version-bump-main
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  bump:
+    name: Bump version and tag release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ github.token }}
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Apply version bump
+        run: npm run version:bump -- ${{ inputs.bump }}
+
+      - name: Verify bumped release
+        run: npm run verify
+
+      - name: Read next version
+        id: release
+        run: |
+          NEXT_VERSION=$(node -p "require('./package.json').version")
+          echo "version=${NEXT_VERSION}" >> "$GITHUB_OUTPUT"
+
+      - name: Commit and tag
+        env:
+          NEXT: ${{ steps.release.outputs.version }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add package.json package-lock.json version.json index.html
+          git commit -m "chore(release): v${NEXT} [skip ci]"
+          git tag "v${NEXT}"
+          git push origin main
+          git push origin "v${NEXT}"
+
+      - name: Summary
+        env:
+          NEXT: ${{ steps.release.outputs.version }}
+          BUMP: ${{ inputs.bump }}
+        run: |
+          echo "### Version bumped to v${NEXT}" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Bump type: \`${BUMP}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "Tag pushed: \`v${NEXT}\`" >> "$GITHUB_STEP_SUMMARY"

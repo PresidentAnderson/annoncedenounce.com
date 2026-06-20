@@ -12,6 +12,7 @@
 - HubSpot-ready launch form (Portal ID: 43986063) with mail fallback
 - Vercel hosting with auto-deploy
 - Sovereign Autonomy Pack for AI-powered development
+- Lightweight CI, version governance, and release bump automation
 
 ## Autonomous Development
 
@@ -29,6 +30,33 @@ make autonomy.run agent=claude max_issues=1
 # View help
 make autonomy.help
 ```
+
+## Verification & Releases
+
+Run the local gate before every commit:
+
+```bash
+npm ci
+npm run verify
+```
+
+The verifier checks version metadata, key static assets, the `/api/version` handler, workflow/canon files, and local static serving.
+
+Version metadata is controlled by:
+
+- `package.json` — canonical semver
+- `version.json` — public release metadata and revision counter
+- `index.html` — visible footer version
+
+To bump locally:
+
+```bash
+npm run version:bump -- patch
+npm run version:bump -- minor
+npm run version:bump -- major
+```
+
+To bump through GitHub Actions, run the **Auto Version Bump** workflow manually. It updates metadata, reruns verification, commits the release bump, and pushes a `vX.Y.Z` tag.
 
 ### Manual Trigger
 
@@ -49,14 +77,27 @@ Add these to repo Settings → Secrets → Actions:
 
 ```
 ├── index.html              # Landing page
+├── package.json            # Scripts and canonical version
+├── package-lock.json       # Reproducible npm install
+├── version.json            # Release revision metadata
 ├── assets/
 │   ├── favicon.png         # Site icon
 │   └── hero-dossier.png    # Local hero visual
+├── api/
+│   └── version.js          # Vercel version endpoint
+├── scripts/
+│   ├── bump-version.mjs    # Semver + revision bump
+│   └── verify-site.mjs     # Static site verification gate
+├── docs/
+│   └── OPERATING_CANON.md  # Repo operating procedure
+├── canon.lock.yaml         # Canon/source lock
 ├── vercel.json             # Vercel config
 ├── autonomy.defaults.yml   # Agent configuration
 ├── Makefile                # Autonomy commands
 └── .github/
     └── workflows/
+        ├── ci.yml                         # Verification workflow
+        ├── auto-version-bump.yml          # Manual release bump
         ├── autonomous-agent-loop.yml      # Main agent workflow
         └── autonomy-pr-review-gate.yml    # PR review automation
 ```
