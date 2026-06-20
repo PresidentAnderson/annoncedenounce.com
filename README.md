@@ -4,14 +4,15 @@
 
 ## Live Site
 
-**Vercel:** https://annoncedenounce-com.vercel.app
+**Production:** https://annoncedenounce.com (Vercel alias: https://annoncedenouncecom.vercel.app)
 
 ## Tech Stack
 
 - Static HTML/CSS landing page
-- HubSpot-ready launch form (Portal ID: 43986063) with mail fallback
-- Vercel hosting with auto-deploy
-- Sovereign Autonomy Pack for AI-powered development
+- HubSpot launch form (Portal ID: 43986063), loaded only after cookie consent, with a first-party email fallback
+- Vercel hosting with auto-deploy, security headers (CSP/HSTS), asset caching, and clean URLs
+- Privacy policy (`/privacy`), robots.txt, sitemap.xml, web manifest, JSON-LD, OG/Twitter cards
+- Vercel Web Analytics + Speed Insights (cookieless)
 - Lightweight CI, version governance, and release bump automation
 
 ## Autonomous Development
@@ -76,7 +77,11 @@ Add these to repo Settings → Secrets → Actions:
 ## Project Structure
 
 ```
-├── index.html              # Landing page
+├── index.html              # Landing page (consent-gated HubSpot form, a11y, SEO meta)
+├── privacy.html            # Privacy policy (/privacy) — Loi 25 / RGPD
+├── robots.txt              # Crawler directives + sitemap reference
+├── sitemap.xml             # Canonical URL sitemap
+├── site.webmanifest        # PWA / install metadata
 ├── package.json            # Scripts and canonical version
 ├── package-lock.json       # Reproducible npm install
 ├── version.json            # Release revision metadata
@@ -104,9 +109,19 @@ Add these to repo Settings → Secrets → Actions:
 
 ## Lead Capture
 
-The launch page attempts to load a HubSpot form for Portal ID `43986063`. If the embedded form is unavailable, the page shows a direct email fallback to `contact@annoncedenounce.com`.
+The HubSpot form (Portal ID `43986063`) is loaded **only after the visitor accepts cookies** (Loi 25 / RGPD). Before consent — or if the visitor declines — the page shows a first-party email fallback to `contact@annoncedenounce.com` that sets no cookies and loads no third-party script.
 
-Before launch, confirm the HubSpot `formId` in `index.html` matches the production form GUID.
+**Before launch you must replace `HUBSPOT_FORM_ID` in `index.html`** (currently `waitlist-annoncedenouncecom`) with the real form GUID from the HubSpot form editor, then submit a live test through production.
+
+## Pre-Launch Checklist
+
+Code-side hardening (security headers, robots/sitemap, consent gate, a11y focus states, SEO meta, CI safety) ships in this repo. The remaining go-live steps require dashboard/account access:
+
+1. **HubSpot:** replace `HUBSPOT_FORM_ID` with the real GUID; submit a test entry into portal `43986063`.
+2. **Vercel → Domains:** add `www.annoncedenounce.com` as a 308 redirect to the apex (auto-provisions its SSL cert).
+3. **Vercel → Analytics:** enable Web Analytics and Speed Insights (the page already includes the scripts).
+4. **Legal:** have a lawyer review `/privacy` (`privacy.html`) and confirm the bracketed `[…]` items (legal entity, retention periods).
+5. **Vercel → Git:** keep branch protection on `main` so the autonomous loop can't push directly; the loop is now manual-only (`workflow_dispatch`).
 
 ## Deployment
 

@@ -1,6 +1,6 @@
 {
   "name": "annoncedenounce-com",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "description": "Annonce Denonce static launch site and operating workflows.",
   "scripts": {

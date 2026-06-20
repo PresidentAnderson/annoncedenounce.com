@@ -41,7 +41,9 @@ jobs:
         run: npm ci
 
       - name: Apply version bump
-        run: npm run version:bump -- ${{ inputs.bump }}
+        env:
+          BUMP: ${{ inputs.bump }}
+        run: npm run version:bump -- "$BUMP"
 
       - name: Verify bumped release
         run: npm run verify

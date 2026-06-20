@@ -39,6 +39,11 @@ function createStaticServer() {
       "/": "index.html",
       "/index.html": "index.html",
       "/version.json": "version.json",
+      "/robots.txt": "robots.txt",
+      "/sitemap.xml": "sitemap.xml",
+      "/site.webmanifest": "site.webmanifest",
+      "/privacy": "privacy.html",
+      "/privacy.html": "privacy.html",
       "/assets/favicon.png": "assets/favicon.png",
       "/assets/hero-dossier.png": "assets/hero-dossier.png",
     };
@@ -51,6 +56,9 @@ function createStaticServer() {
       ".html": "text/html",
       ".json": "application/json",
       ".png": "image/png",
+      ".txt": "text/plain",
+      ".xml": "application/xml",
+      ".webmanifest": "application/manifest+json",
     };
     const ext = file.slice(file.lastIndexOf("."));
     res.writeHead(200, { "content-type": contentTypes[ext] || "application/octet-stream" });
@@ -63,7 +71,17 @@ async function verifyStaticServer() {
   await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
 
   try {
-    for (const path of ["/", "/index.html", "/version.json", "/assets/favicon.png", "/assets/hero-dossier.png"]) {
+    for (const path of [
+      "/",
+      "/index.html",
+      "/version.json",
+      "/robots.txt",
+      "/sitemap.xml",
+      "/site.webmanifest",
+      "/privacy",
+      "/assets/favicon.png",
+      "/assets/hero-dossier.png",
+    ]) {
       const result = await request(server, path);
       assert.equal(result.status, 200, `${path} must return HTTP 200`);
       assert.ok(result.bodyBytes > 0, `${path} must return a non-empty body`);
@@ -116,7 +134,24 @@ function verifyFilesAndVersion() {
   assert.ok(html.includes(`id="site-version">v${pkg.version}`), "footer must show the current site version");
   assert.ok(html.includes('id="contact"'), "contact section must exist");
   assert.ok(html.includes('id="fallback-form"'), "email fallback form must exist");
+  assert.ok(html.includes('id="consent-banner"'), "cookie consent banner must exist");
+  assert.ok(html.includes('name="twitter:card"'), "twitter card metadata must exist");
+  assert.ok(html.includes("application/ld+json"), "structured data (JSON-LD) must exist");
+  assert.ok(html.includes('rel="manifest"'), "web manifest link must exist");
+  assert.ok(!html.includes("A new version of the site is available"), "version banner must be localized (no English copy)");
   assert.ok(!/TODO|placeholder text|IMPLEMENTATION_\d+/.test(html), "index.html must not ship placeholders");
+
+  const vercel = readJson("vercel.json");
+  assert.ok(Array.isArray(vercel.headers), "vercel.json must define response headers");
+  const hasCsp = vercel.headers.some((rule) =>
+    (rule.headers || []).some((header) => header.key === "Content-Security-Policy")
+  );
+  assert.ok(hasCsp, "vercel.json must set a Content-Security-Policy header");
+
+  const robots = readText("robots.txt");
+  assert.ok(/Sitemap:\s*https:\/\/annoncedenounce\.com\/sitemap\.xml/.test(robots), "robots.txt must reference the sitemap");
+  const sitemap = readText("sitemap.xml");
+  assert.ok(sitemap.includes("https://annoncedenounce.com"), "sitemap.xml must list the canonical domain");
 
   for (const file of [
     ".github/workflows/autonomous-agent-loop.yml",
@@ -126,6 +161,10 @@ function verifyFilesAndVersion() {
     "api/version.js",
     "assets/favicon.png",
     "assets/hero-dossier.png",
+    "robots.txt",
+    "sitemap.xml",
+    "site.webmanifest",
+    "privacy.html",
     "canon.lock.yaml",
     "docs/OPERATING_CANON.md",
   ]) {
