@@ -1,6 +1,6 @@
 {
-  "version": "0.3.0",
-  "revision": 2,
+  "version": "0.3.1",
+  "revision": 3,
   "lastUpdated": "2026-06-20",
   "channel": "main",
   "source": "package.json"
