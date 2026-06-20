@@ -3,154 +3,971 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Annonce Dénonce — Annoncer. Dénoncer. Être entendu.</title>
-  <meta name="description" content="Annonce Dénonce — une plateforme pour signaler, documenter et rendre visibles les manquements." />
+  <title>Annonce Dénonce | Dénoncer. Être entendu.</title>
+  <meta name="description" content="Annonce Dénonce est une plateforme en préparation pour signaler, documenter et rendre visibles les manquements d'intérêt public." />
   <link rel="canonical" href="https://annoncedenounce.com" />
   <meta property="og:title" content="Annonce Dénonce" />
-  <meta property="og:description" content="Une plateforme pour donner une voix : signaler, documenter et rendre visibles les manquements. — Announce. Den" />
+  <meta property="og:description" content="Une plateforme pour donner une voix : signaler, documenter et rendre visibles les manquements. Announce. Denounce. Be heard." />
   <meta property="og:url" content="https://annoncedenounce.com" />
   <meta property="og:type" content="website" />
+  <meta property="og:image" content="https://annoncedenounce.com/assets/hero-dossier.png" />
+  <link rel="icon" href="assets/favicon.png" type="image/png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet" />
+  <script charset="utf-8" type="text/javascript" src="https://js.hsforms.net/forms/embed/v2.js" defer></script>
   <style>
-    :root{
-      --bg:#0b1020; --bg2:#111a33; --ink:#f4f6fb; --muted:#9aa6c2;
-      --brand:#e63950; --brand2:#ff6b6b; --accent:#ffd166;
-      --card:rgba(255,255,255,.04); --line:rgba(255,255,255,.10); --maxw:1080px;
+    :root {
+      --bg: #071017;
+      --bg-2: #0e1b22;
+      --ink: #f7f4ed;
+      --muted: #b9c4c2;
+      --quiet: #7f908e;
+      --paper: #fffaf0;
+      --brand: #f45b69;
+      --brand-2: #c83d4b;
+      --teal: #4ecdc4;
+      --gold: #ffd166;
+      --line: rgba(247, 244, 237, .15);
+      --panel: rgba(7, 16, 23, .72);
+      --maxw: 1120px;
     }
-    *{margin:0;padding:0;box-sizing:border-box}
-    html{scroll-behavior:smooth}
-    body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:var(--ink);background:var(--bg);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
-    .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
-    a{color:inherit;text-decoration:none}
-    h1,h2,h3{font-family:'Sora',sans-serif;line-height:1.15;letter-spacing:-.02em}
-    .glow{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(60vw 60vw at 75% -10%, rgba(124,92,255,.22), transparent 60%),radial-gradient(50vw 50vw at 0% 100%, rgba(233,69,96,.18), transparent 55%)}
-    header{position:relative;z-index:2;padding:26px 0}
-    .nav{display:flex;align-items:center;justify-content:space-between}
-    .brand{display:flex;align-items:center;gap:12px;font-family:'Sora';font-weight:800;font-size:1.15rem}
-    .mark{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;font-weight:800;background:linear-gradient(135deg,var(--brand),var(--brand2));box-shadow:0 8px 24px rgba(124,92,255,.35)}
-    .nav a.cta{font-weight:600;font-size:.92rem;padding:10px 18px;border:1px solid var(--line);border-radius:999px;transition:.2s}
-    .nav a.cta:hover{background:var(--card);border-color:rgba(255,255,255,.25)}
-    .hero{position:relative;z-index:2;padding:64px 0 40px;text-align:center}
-    .pill{display:inline-flex;align-items:center;gap:8px;font-size:.8rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);border:1px solid var(--line);padding:7px 14px;border-radius:999px;margin-bottom:26px}
-    .pill .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 12px var(--accent)}
-    .hero h1{font-size:clamp(2.4rem,6vw,4.2rem);font-weight:800;margin-bottom:18px}
-    .hero h1 .grad{background:linear-gradient(90deg,var(--brand),var(--brand2) 60%,var(--accent));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
-    .hero p.lead{font-size:clamp(1.05rem,2.2vw,1.3rem);color:var(--muted);max-width:640px;margin:0 auto 34px}
-    .actions{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
-    .btn{font-weight:600;padding:14px 26px;border-radius:999px;transition:.25s;border:1px solid transparent;cursor:pointer;font-size:1rem}
-    .btn-primary{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;box-shadow:0 12px 30px rgba(233,69,96,.3)}
-    .btn-primary:hover{transform:translateY(-2px);box-shadow:0 18px 40px rgba(233,69,96,.42)}
-    .btn-ghost{border-color:var(--line);color:var(--ink)}
-    .btn-ghost:hover{background:var(--card)}
-    .features{position:relative;z-index:2;padding:60px 0}
-    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
-    .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:28px;backdrop-filter:blur(8px);transition:.25s}
-    .card:hover{transform:translateY(-4px);border-color:rgba(255,255,255,.22)}
-    .card .ico{width:46px;height:46px;border-radius:12px;display:grid;place-items:center;font-size:1.3rem;margin-bottom:16px;background:linear-gradient(135deg,rgba(124,92,255,.25),rgba(54,209,196,.18));border:1px solid var(--line)}
-    .card h3{font-size:1.2rem;margin-bottom:8px}
-    .card p{color:var(--muted);font-size:.96rem}
-    .cta-band{position:relative;z-index:2;padding:30px 0 80px}
-    .panel{background:linear-gradient(135deg,rgba(124,92,255,.14),rgba(233,69,96,.10));border:1px solid var(--line);border-radius:24px;padding:46px 32px;text-align:center}
-    .panel h2{font-size:clamp(1.6rem,3.4vw,2.2rem);margin-bottom:10px}
-    .panel p{color:var(--muted);max-width:520px;margin:0 auto 26px}
-    form.signup{display:flex;gap:10px;max-width:460px;margin:0 auto;flex-wrap:wrap;justify-content:center}
-    form.signup input{flex:1;min-width:220px;padding:14px 18px;border-radius:999px;border:1px solid var(--line);background:rgba(0,0,0,.25);color:var(--ink);font-size:1rem}
-    form.signup input::placeholder{color:#7e8aa8}
-    form.signup .ok{font-size:.9rem;color:var(--accent);margin-top:14px;width:100%}
-    footer{position:relative;z-index:2;border-top:1px solid var(--line);padding:30px 0;color:var(--muted);font-size:.9rem}
-    .foot{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
-    .foot a:hover{color:var(--ink)}
-    @media(max-width:760px){.grid{grid-template-columns:1fr}}
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      background: #071017 url("assets/hero-dossier.png") center top / cover no-repeat;
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background:
+        linear-gradient(180deg, rgba(7, 16, 23, .54) 0%, rgba(7, 16, 23, .82) 48%, #071017 78%),
+        linear-gradient(90deg, rgba(7, 16, 23, .38), rgba(7, 16, 23, .14) 50%, rgba(7, 16, 23, .42));
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    h1,
+    h2,
+    h3 {
+      font-family: "Sora", sans-serif;
+      letter-spacing: 0;
+      line-height: 1.12;
+    }
+
+    .wrap {
+      width: min(100%, var(--maxw));
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .skip {
+      position: absolute;
+      left: 16px;
+      top: -60px;
+      z-index: 20;
+      padding: 10px 14px;
+      border-radius: 8px;
+      background: var(--paper);
+      color: var(--bg);
+      font-weight: 700;
+    }
+
+    .skip:focus {
+      top: 16px;
+    }
+
+    header {
+      position: relative;
+      z-index: 2;
+      padding: 22px 0;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+      font-family: "Sora", sans-serif;
+      font-weight: 800;
+      font-size: 1.04rem;
+    }
+
+    .mark {
+      display: grid;
+      width: 36px;
+      height: 36px;
+      flex: 0 0 36px;
+      place-items: center;
+      border: 1px solid rgba(255, 255, 255, .25);
+      border-radius: 8px;
+      background: rgba(244, 91, 105, .88);
+      color: #fff;
+      font-size: .82rem;
+      font-weight: 800;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: .92rem;
+      font-weight: 700;
+    }
+
+    .nav-links a {
+      padding: 9px 12px;
+      border-radius: 8px;
+    }
+
+    .nav-links a:hover,
+    .nav-links a:focus-visible {
+      background: rgba(255, 255, 255, .08);
+      color: var(--ink);
+      outline: none;
+    }
+
+    main {
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero {
+      min-height: 660px;
+      display: grid;
+      align-items: center;
+      padding: 72px 0 118px;
+    }
+
+    .hero-copy {
+      max-width: 760px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 22px;
+      color: var(--gold);
+      font-size: .8rem;
+      font-weight: 800;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 36px;
+      height: 2px;
+      background: var(--gold);
+    }
+
+    h1 {
+      max-width: 740px;
+      margin-bottom: 22px;
+      font-size: 4.25rem;
+      font-weight: 800;
+    }
+
+    .accent {
+      color: var(--brand);
+    }
+
+    .lead {
+      max-width: 650px;
+      margin-bottom: 32px;
+      color: #dde6e3;
+      font-size: 1.22rem;
+    }
+
+    .lead strong {
+      color: var(--ink);
+      font-weight: 800;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 34px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      padding: 12px 20px;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform .2s ease, background .2s ease, border-color .2s ease;
+    }
+
+    .btn:hover,
+    .btn:focus-visible {
+      transform: translateY(-2px);
+      outline: none;
+    }
+
+    .btn-primary {
+      background: var(--brand);
+      color: #fff;
+      box-shadow: 0 16px 34px rgba(244, 91, 105, .22);
+    }
+
+    .btn-primary:hover,
+    .btn-primary:focus-visible {
+      background: var(--brand-2);
+    }
+
+    .btn-ghost {
+      border-color: var(--line);
+      background: rgba(7, 16, 23, .54);
+      color: var(--ink);
+    }
+
+    .btn-ghost:hover,
+    .btn-ghost:focus-visible {
+      border-color: rgba(255, 255, 255, .34);
+      background: rgba(255, 255, 255, .08);
+    }
+
+    .note-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      color: var(--muted);
+      font-size: .94rem;
+    }
+
+    .note-row span {
+      padding: 7px 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(7, 16, 23, .46);
+    }
+
+    .section {
+      padding: 76px 0;
+      background: var(--bg);
+    }
+
+    .section.alt {
+      background: var(--bg-2);
+    }
+
+    .section-head {
+      display: grid;
+      grid-template-columns: minmax(0, .75fr) minmax(280px, 1fr);
+      gap: 42px;
+      align-items: end;
+      margin-bottom: 30px;
+    }
+
+    .section-kicker {
+      margin-bottom: 12px;
+      color: var(--teal);
+      font-size: .82rem;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    h2 {
+      font-size: 2.35rem;
+      font-weight: 800;
+    }
+
+    .section-head p {
+      color: var(--muted);
+      font-size: 1.04rem;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      min-height: 100%;
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 250, 240, .045);
+    }
+
+    .card-number {
+      display: inline-grid;
+      width: 36px;
+      height: 36px;
+      margin-bottom: 18px;
+      place-items: center;
+      border-radius: 8px;
+      background: var(--paper);
+      color: var(--bg);
+      font-weight: 800;
+    }
+
+    .card h3 {
+      margin-bottom: 8px;
+      font-size: 1.18rem;
+    }
+
+    .card p {
+      color: var(--muted);
+    }
+
+    .process {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .process-item {
+      display: grid;
+      grid-template-columns: 64px minmax(0, 1fr);
+      gap: 18px;
+      align-items: start;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(7, 16, 23, .42);
+    }
+
+    .step {
+      display: grid;
+      width: 64px;
+      height: 64px;
+      place-items: center;
+      border-radius: 8px;
+      background: rgba(78, 205, 196, .14);
+      color: var(--teal);
+      font-family: "Sora", sans-serif;
+      font-weight: 800;
+    }
+
+    .process-item h3 {
+      margin-bottom: 6px;
+      font-size: 1.08rem;
+    }
+
+    .process-item p {
+      color: var(--muted);
+    }
+
+    .contact {
+      padding: 84px 0;
+      background: #0a1218;
+    }
+
+    .contact-panel {
+      display: grid;
+      grid-template-columns: minmax(0, .85fr) minmax(320px, 1fr);
+      gap: 42px;
+      align-items: start;
+      padding: 34px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 250, 240, .055);
+    }
+
+    .contact-panel h2 {
+      margin-bottom: 14px;
+    }
+
+    .contact-panel p {
+      color: var(--muted);
+    }
+
+    .contact-list {
+      display: grid;
+      gap: 12px;
+      margin-top: 22px;
+      color: var(--muted);
+      list-style: none;
+    }
+
+    .contact-list li {
+      padding-left: 16px;
+      border-left: 3px solid var(--brand);
+    }
+
+    .form-shell {
+      min-height: 248px;
+      padding: 22px;
+      border: 1px solid rgba(255, 255, 255, .14);
+      border-radius: 8px;
+      background: rgba(7, 16, 23, .72);
+    }
+
+    .form-shell h3 {
+      margin-bottom: 8px;
+      font-size: 1.1rem;
+    }
+
+    .form-shell p {
+      margin-bottom: 16px;
+      color: var(--muted);
+      font-size: .94rem;
+    }
+
+    .signup {
+      display: grid;
+      gap: 10px;
+    }
+
+    .signup label {
+      color: var(--ink);
+      font-size: .9rem;
+      font-weight: 700;
+    }
+
+    .signup input {
+      width: 100%;
+      min-height: 48px;
+      padding: 12px 14px;
+      border: 1px solid rgba(255, 255, 255, .18);
+      border-radius: 8px;
+      background: rgba(0, 0, 0, .22);
+      color: var(--ink);
+      font: inherit;
+    }
+
+    .signup input::placeholder {
+      color: var(--quiet);
+    }
+
+    .form-status {
+      min-height: 24px;
+      color: var(--gold);
+      font-size: .9rem;
+    }
+
+    .direct-mail {
+      display: inline-flex;
+      margin-top: 16px;
+      color: var(--gold);
+      font-weight: 800;
+      overflow-wrap: anywhere;
+    }
+
+    .hs-form input,
+    .hs-form textarea,
+    .hs-form select {
+      width: 100% !important;
+      min-height: 46px !important;
+      padding: 12px 14px !important;
+      border: 1px solid rgba(255, 255, 255, .18) !important;
+      border-radius: 8px !important;
+      background: rgba(0, 0, 0, .22) !important;
+      color: var(--ink) !important;
+      font: inherit !important;
+    }
+
+    .hs-form label {
+      color: var(--ink) !important;
+      font-weight: 700 !important;
+    }
+
+    .hs-button {
+      min-height: 48px !important;
+      padding: 12px 20px !important;
+      border: 0 !important;
+      border-radius: 8px !important;
+      background: var(--brand) !important;
+      color: #fff !important;
+      font-weight: 800 !important;
+      cursor: pointer !important;
+    }
+
+    .submitted-message {
+      color: var(--gold) !important;
+      font-weight: 800 !important;
+    }
+
+    footer {
+      padding: 28px 0;
+      border-top: 1px solid var(--line);
+      background: #060c11;
+      color: var(--quiet);
+      font-size: .9rem;
+    }
+
+    .foot {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .version-banner {
+      position: fixed;
+      left: 50%;
+      bottom: 20px;
+      z-index: 99999;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 10px 18px;
+      width: min(94vw, 540px);
+      padding: 14px 18px;
+      border: 1px solid rgba(255, 255, 255, .12);
+      border-radius: 8px;
+      background: #111827;
+      box-shadow: 0 18px 50px -18px rgba(0, 0, 0, .6);
+      color: #f9fafb;
+      font: 600 .95rem/1.4 system-ui, -apple-system, Segoe UI, sans-serif;
+      transform: translateX(-50%);
+    }
+
+    .version-banner-copy {
+      display: flex;
+      min-width: 0;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .version-banner-copy small {
+      color: #9ca3af;
+      font-size: .8rem;
+      font-weight: 400;
+    }
+
+    .version-banner-actions {
+      display: flex;
+      flex-shrink: 0;
+      gap: 8px;
+    }
+
+    .version-banner button {
+      cursor: pointer;
+      border-radius: 8px;
+      padding: 9px 14px;
+      font: 600 .9rem system-ui;
+    }
+
+    .version-update {
+      border: 0;
+      background: #f9fafb;
+      color: #111827;
+    }
+
+    .version-later {
+      border: 1px solid rgba(255, 255, 255, .18);
+      background: transparent;
+      color: #9ca3af;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    @media (max-width: 880px) {
+      .section-head,
+      .process,
+      .contact-panel {
+        grid-template-columns: 1fr;
+      }
+
+      .grid-3 {
+        grid-template-columns: 1fr;
+      }
+
+      .hero {
+        min-height: 610px;
+        padding-top: 44px;
+      }
+
+      h1 {
+        font-size: 3.15rem;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .wrap {
+        padding: 0 18px;
+      }
+
+      .nav {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .nav-links {
+        width: 100%;
+        justify-content: space-between;
+      }
+
+      .hero {
+        min-height: 590px;
+        padding-bottom: 76px;
+      }
+
+      h1 {
+        font-size: 2.42rem;
+      }
+
+      h2 {
+        font-size: 1.88rem;
+      }
+
+      .lead {
+        font-size: 1.08rem;
+      }
+
+      .btn {
+        width: 100%;
+      }
+
+      .process-item {
+        grid-template-columns: 1fr;
+      }
+
+      .contact-panel,
+      .form-shell,
+      .card,
+      .process-item {
+        padding: 20px;
+      }
+    }
   </style>
 </head>
 <body>
-  <div class="glow"></div>
-  <header><div class="wrap nav">
-    <div class="brand"><span class="mark">AD</span> Annonce Dénonce</div>
-    <a class="cta" href="#contact">Nous écrire</a>
-  </div></header>
-  <!-- ====== EDIT COPY BELOW (placeholder text — search TODO) ====== -->
-  <section class="hero"><div class="wrap">
-    <span class="pill"><span class="dot"></span> Bientôt en ligne</span>
-    <h1>Annoncer. <span class="grad">Dénoncer.</span> Être entendu.</h1>
-    <p class="lead">Une plateforme pour donner une voix : signaler, documenter et rendre visibles les manquements. — Announce. Denounce. Be heard. <!-- TODO: real one-liner --></p>
-    <div class="actions">
-      <a class="btn btn-primary" href="#contact">Nous écrire</a>
-      <a class="btn btn-ghost" href="#what">En savoir plus</a>
+  <a class="skip" href="#main">Aller au contenu</a>
+
+  <header>
+    <div class="wrap nav" aria-label="Navigation principale">
+      <a class="brand" href="#top" aria-label="Annonce Dénonce">
+        <span class="mark" aria-hidden="true">AD</span>
+        <span>Annonce Dénonce</span>
+      </a>
+      <nav class="nav-links" aria-label="Sections">
+        <a href="#what">Mission</a>
+        <a href="#how">Processus</a>
+        <a href="#contact">Contact</a>
+      </nav>
     </div>
-  </div></section>
-  <section class="features" id="what"><div class="wrap"><div class="grid">
-    <div class="card"><div class="ico">📣</div><h3>Signaler</h3><p>Donnez l'alerte en toute sécurité. <!-- TODO --></p></div>
-    <div class="card"><div class="ico">🗂️</div><h3>Documenter</h3><p>Conservez les faits, datés et organisés. <!-- TODO --></p></div>
-    <div class="card"><div class="ico">🛡️</div><h3>Protéger</h3><p>La voix protégée, l'intérêt public servi. <!-- TODO --></p></div>
-  </div></div></section>
-  <section class="cta-band" id="contact"><div class="wrap"><div class="panel">
-    <h2>Faites entendre votre voix.</h2>
-    <p>Inscrivez-vous pour être informé du lancement.</p>
-    <form class="signup" onsubmit="event.preventDefault(); this.querySelector('.ok').hidden=false; this.reset();">
-      <input type="email" required placeholder="vous@exemple.com" aria-label="Email" />
-      <button class="btn btn-primary" type="submit">M'aviser</button>
-      <span class="ok" hidden>Merci — nous vous écrirons. <!-- TODO: connect to HubSpot form/backend --></span>
-    </form>
-    <p style="margin-top:18px;font-size:.9rem">Ou écrivez à <a href="mailto:contact@annoncedenounce.com" style="color:var(--accent)">contact@annoncedenounce.com</a> <!-- TODO: real address --></p>
-  </div></div></section>
-  <!-- ====== EDIT COPY ABOVE ====== -->
-  <footer><div class="wrap foot">
-    <div>© <span id="y"></span> Annonce Dénonce</div>
-    <div>annoncedenounce.com</div>
-  </div></footer>
-  <script>document.getElementById('y').textContent=new Date().getFullYear();</script>
-    <!-- New-version notifier: records the deployed commit on load, polls /api/version,
-         and offers a one-click refresh when a newer deployment ships. -->
-    <script>
-      (function () {
-        var loaded = null, dismissed = null, el = null;
-        function show(commit) {
-          if (el) return;
-          el = document.createElement("div");
-          el.setAttribute("role", "status");
-          el.setAttribute("aria-live", "polite");
-          el.style.cssText =
-            "position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:99999;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px 18px;max-width:min(94vw,540px);padding:14px 18px;border-radius:14px;background:#111827;border:1px solid rgba(255,255,255,.12);box-shadow:0 18px 50px -18px rgba(0,0,0,.6);color:#f9fafb;font:600 .95rem/1.4 system-ui,-apple-system,Segoe UI,sans-serif";
-          var copy = document.createElement("span");
-          copy.style.cssText = "display:flex;flex-direction:column;gap:2px;min-width:0";
-          copy.innerHTML =
-            '<span>A new version of the site is available.</span><span style="font-size:.8rem;font-weight:400;color:#9ca3af">Updating takes less than 5 seconds.</span>';
-          var actions = document.createElement("span");
-          actions.style.cssText = "display:flex;gap:8px;flex-shrink:0";
-          var up = document.createElement("button");
-          up.type = "button"; up.textContent = "Update";
-          up.style.cssText =
-            "cursor:pointer;border:none;border-radius:999px;padding:9px 18px;font:600 .9rem system-ui;background:#f9fafb;color:#111827";
-          up.onclick = function () { window.location.reload(); };
-          var no = document.createElement("button");
-          no.type = "button"; no.textContent = "Later";
-          no.style.cssText =
-            "cursor:pointer;border-radius:999px;padding:9px 14px;font:.9rem system-ui;background:transparent;border:1px solid rgba(255,255,255,.18);color:#9ca3af";
-          no.onclick = function () { dismissed = commit; if (el) { el.remove(); el = null; } };
-          actions.appendChild(up); actions.appendChild(no);
-          el.appendChild(copy); el.appendChild(actions);
-          document.body.appendChild(el);
+  </header>
+
+  <main id="main">
+    <section class="hero" id="top">
+      <div class="wrap">
+        <div class="hero-copy">
+          <p class="eyebrow">Bientôt en ligne</p>
+          <h1>Dénoncer. <span class="accent">Être entendu.</span></h1>
+          <p class="lead">
+            Une plateforme pour donner une voix : signaler, documenter et rendre visibles les manquements.
+            <strong>Announce. Denounce. Be heard.</strong>
+          </p>
+          <div class="actions">
+            <a class="btn btn-primary" href="#contact">Nous écrire</a>
+            <a class="btn btn-ghost" href="#what">En savoir plus</a>
+          </div>
+          <div class="note-row" aria-label="Principes de lancement">
+            <span>Signalements structurés</span>
+            <span>Documentation datée</span>
+            <span>Intérêt public</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="what">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <p class="section-kicker">Mission</p>
+            <h2>Rendre les faits visibles sans perdre la voix humaine.</h2>
+          </div>
+          <p>
+            Annonce Dénonce prépare un espace sobre et utile pour les personnes qui doivent signaler un manquement,
+            organiser un récit factuel et préserver les éléments essentiels avant qu'ils se perdent.
+          </p>
+        </div>
+
+        <div class="grid-3">
+          <article class="card">
+            <span class="card-number">01</span>
+            <h3>Signaler</h3>
+            <p>Donnez l'alerte avec un parcours clair, pensé pour distinguer les faits, les dates, les personnes concernées et les documents disponibles.</p>
+          </article>
+          <article class="card">
+            <span class="card-number">02</span>
+            <h3>Documenter</h3>
+            <p>Conservez les éléments importants dans une chronologie organisée afin de faciliter la compréhension, la vérification et le suivi.</p>
+          </article>
+          <article class="card">
+            <span class="card-number">03</span>
+            <h3>Protéger</h3>
+            <p>Mettre la sécurité, la prudence et la dignité au centre du signalement : la voix protégée, l'intérêt public servi.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section alt" id="how">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <p class="section-kicker">Processus</p>
+            <h2>Une méthode simple pour passer du vécu au dossier.</h2>
+          </div>
+          <p>
+            Le produit complet est en construction. La première version se concentre sur l'inscription au lancement,
+            la réception des demandes et la préparation d'un flux de signalement responsable.
+          </p>
+        </div>
+
+        <div class="process">
+          <article class="process-item">
+            <span class="step">1</span>
+            <div>
+              <h3>Décrire</h3>
+              <p>Clarifier ce qui s'est passé, où, quand et pourquoi cela mérite attention.</p>
+            </div>
+          </article>
+          <article class="process-item">
+            <span class="step">2</span>
+            <div>
+              <h3>Assembler</h3>
+              <p>Joindre les preuves, organiser les dates et repérer les pièces manquantes.</p>
+            </div>
+          </article>
+          <article class="process-item">
+            <span class="step">3</span>
+            <div>
+              <h3>Évaluer</h3>
+              <p>Identifier les risques, les destinataires possibles et les précautions nécessaires.</p>
+            </div>
+          </article>
+          <article class="process-item">
+            <span class="step">4</span>
+            <div>
+              <h3>Suivre</h3>
+              <p>Garder une trace des démarches, des réponses et des prochaines actions.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="contact" id="contact">
+      <div class="wrap">
+        <div class="contact-panel">
+          <div>
+            <p class="section-kicker">Lancement</p>
+            <h2>Faites entendre votre voix.</h2>
+            <p>
+              Inscrivez-vous pour être informé du lancement, proposer une collaboration ou transmettre une demande initiale.
+            </p>
+            <ul class="contact-list">
+              <li>Français et anglais acceptés.</li>
+              <li>Ne transmettez pas encore de documents sensibles par ce formulaire public.</li>
+              <li>Pour une demande directe : <a class="direct-mail" href="mailto:contact@annoncedenounce.com">contact@annoncedenounce.com</a></li>
+            </ul>
+          </div>
+
+          <div class="form-shell">
+            <h3>Être avisé du lancement</h3>
+            <p>Le formulaire HubSpot se chargera ici. Si rien n'apparaît, utilisez l'option courriel.</p>
+            <div id="hubspot-form" aria-live="polite"></div>
+            <form class="signup" id="fallback-form" hidden>
+              <label for="email">Votre courriel</label>
+              <input id="email" type="email" required placeholder="vous@exemple.com" autocomplete="email" />
+              <button class="btn btn-primary" type="submit">M'aviser</button>
+              <p class="form-status" id="form-status" aria-live="polite"></p>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap foot">
+      <div>© <span id="year"></span> Annonce Dénonce</div>
+      <div>annoncedenounce.com</div>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+
+  <script>
+    (function () {
+      var fallback = document.getElementById("fallback-form");
+      var slot = document.getElementById("hubspot-form");
+      var status = document.getElementById("form-status");
+
+      function showFallback() {
+        if (!fallback || fallback.hidden === false) return;
+        var loaded = slot && (slot.querySelector("form") || slot.querySelector("iframe"));
+        if (!loaded) fallback.hidden = false;
+      }
+
+      function bootHubSpot() {
+        if (!window.hbspt || !window.hbspt.forms || !slot) {
+          showFallback();
+          return;
         }
-        function check() {
-          fetch("/api/version", { cache: "no-store" })
-            .then(function (r) { return r.ok ? r.json() : null; })
-            .then(function (j) {
-              if (!j || !j.commit) return;
-              if (loaded === null) { loaded = j.commit; return; }
-              if (j.commit !== loaded && j.commit !== dismissed) show(j.commit);
-            })
-            .catch(function () {});
+
+        try {
+          window.hbspt.forms.create({
+            portalId: "43986063",
+            formId: "waitlist-annoncedenouncecom",
+            region: "na1",
+            target: "#hubspot-form",
+            onFormReady: function () {
+              if (fallback) fallback.hidden = true;
+            },
+            onFormSubmitted: function () {
+              if (status) status.textContent = "Merci, nous vous écrirons.";
+            }
+          });
+        } catch (error) {
+          showFallback();
         }
-        setTimeout(check, 15000);
-        setInterval(check, 180000);
-        document.addEventListener("visibilitychange", function () {
-          if (document.visibilityState === "visible") check();
+      }
+
+      if (fallback) {
+        fallback.addEventListener("submit", function (event) {
+          event.preventDefault();
+          var email = document.getElementById("email").value.trim();
+          var subject = encodeURIComponent("Inscription au lancement Annonce Denonce");
+          var body = encodeURIComponent("Bonjour,\n\nJe souhaite etre avise du lancement d'Annonce Denonce.\n\nCourriel : " + email);
+          window.location.href = "mailto:contact@annoncedenounce.com?subject=" + subject + "&body=" + body;
+          if (status) status.textContent = "Votre application courriel va s'ouvrir pour confirmer l'inscription.";
         });
-        window.addEventListener("focus", check);
-      })();
-    </script>
+      }
+
+      window.addEventListener("load", function () {
+        setTimeout(bootHubSpot, 250);
+        setTimeout(showFallback, 3000);
+      });
+    })();
+  </script>
+
+  <script>
+    (function () {
+      if (
+        window.location.protocol === "file:" ||
+        window.location.hostname === "localhost" ||
+        window.location.hostname === "127.0.0.1"
+      ) {
+        return;
+      }
+
+      var loaded = null;
+      var dismissed = null;
+      var el = null;
+
+      function show(commit) {
+        if (el) return;
+
+        el = document.createElement("div");
+        el.className = "version-banner";
+        el.setAttribute("role", "status");
+        el.setAttribute("aria-live", "polite");
+
+        var copy = document.createElement("span");
+        copy.className = "version-banner-copy";
+        copy.innerHTML = "<span>A new version of the site is available.</span><small>Updating takes less than 5 seconds.</small>";
+
+        var actions = document.createElement("span");
+        actions.className = "version-banner-actions";
+
+        var update = document.createElement("button");
+        update.type = "button";
+        update.className = "version-update";
+        update.textContent = "Update";
+        update.onclick = function () {
+          window.location.reload();
+        };
+
+        var later = document.createElement("button");
+        later.type = "button";
+        later.className = "version-later";
+        later.textContent = "Later";
+        later.onclick = function () {
+          dismissed = commit;
+          if (el) {
+            el.remove();
+            el = null;
+          }
+        };
+
+        actions.appendChild(update);
+        actions.appendChild(later);
+        el.appendChild(copy);
+        el.appendChild(actions);
+        document.body.appendChild(el);
+      }
+
+      function check() {
+        fetch("/api/version", { cache: "no-store" })
+          .then(function (response) {
+            return response.ok ? response.json() : null;
+          })
+          .then(function (json) {
+            if (!json || !json.commit) return;
+            if (loaded === null) {
+              loaded = json.commit;
+              return;
+            }
+            if (json.commit !== loaded && json.commit !== dismissed) show(json.commit);
+          })
+          .catch(function () {});
+      }
+
+      setTimeout(check, 15000);
+      setInterval(check, 180000);
+      document.addEventListener("visibilitychange", function () {
+        if (document.visibilityState === "visible") check();
+      });
+      window.addEventListener("focus", check);
+    })();
+  </script>
 </body>
 </html>

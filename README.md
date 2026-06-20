@@ -9,7 +9,7 @@
 ## Tech Stack
 
 - Static HTML/CSS landing page
-- HubSpot lead capture (Portal ID: 43986063)
+- HubSpot-ready launch form (Portal ID: 43986063) with mail fallback
 - Vercel hosting with auto-deploy
 - Sovereign Autonomy Pack for AI-powered development
 
@@ -49,6 +49,9 @@ Add these to repo Settings → Secrets → Actions:
 
 ```
 ├── index.html              # Landing page
+├── assets/
+│   ├── favicon.png         # Site icon
+│   └── hero-dossier.png    # Local hero visual
 ├── vercel.json             # Vercel config
 ├── autonomy.defaults.yml   # Agent configuration
 ├── Makefile                # Autonomy commands
@@ -60,7 +63,9 @@ Add these to repo Settings → Secrets → Actions:
 
 ## Lead Capture
 
-Leads are captured via HubSpot forms and sent to Portal ID `43986063`.
+The launch page attempts to load a HubSpot form for Portal ID `43986063`. If the embedded form is unavailable, the page shows a direct email fallback to `contact@annoncedenounce.com`.
+
+Before launch, confirm the HubSpot `formId` in `index.html` matches the production form GUID.
 
 ## Deployment
 
