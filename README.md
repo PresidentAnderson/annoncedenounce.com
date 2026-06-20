@@ -57,7 +57,7 @@ npm run version:bump -- minor
 npm run version:bump -- major
 ```
 
-To bump through GitHub Actions, run the **Auto Version Bump** workflow manually. It updates metadata, reruns verification, commits the release bump, and pushes a `vX.Y.Z` tag.
+To bump through GitHub Actions, run the **Auto Version Bump** workflow manually. Because `main` is protected (no direct pushes), it updates metadata, reruns verification, and **opens a release PR that auto-merges once the CI verify check passes**. On merge, the **Tag Release** workflow tags `vX.Y.Z` and creates a GitHub Release.
 
 ### Manual Trigger
 
@@ -102,8 +102,9 @@ Add these to repo Settings → Secrets → Actions:
 └── .github/
     └── workflows/
         ├── ci.yml                         # Verification workflow
-        ├── auto-version-bump.yml          # Manual release bump
-        ├── autonomous-agent-loop.yml      # Main agent workflow
+        ├── auto-version-bump.yml          # Manual release bump (opens auto-merging PR)
+        ├── tag-release.yml                # Tags vX.Y.Z + GitHub Release on merge
+        ├── autonomous-agent-loop.yml      # Manual agent workflow (workflow_dispatch only)
         └── autonomy-pr-review-gate.yml    # PR review automation
 ```
 

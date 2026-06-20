@@ -158,6 +158,7 @@ function verifyFilesAndVersion() {
     ".github/workflows/autonomy-pr-review-gate.yml",
     ".github/workflows/ci.yml",
     ".github/workflows/auto-version-bump.yml",
+    ".github/workflows/tag-release.yml",
     "api/version.js",
     "assets/favicon.png",
     "assets/hero-dossier.png",

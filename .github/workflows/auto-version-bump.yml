@@ -1,5 +1,8 @@
 name: Auto Version Bump
 
+# Branch protection blocks direct pushes to main, so this no longer pushes to main.
+# It opens a release PR that auto-merges once the CI verify check passes; the
+# Tag Release workflow then tags the version on the merge commit.
 on:
   workflow_dispatch:
     inputs:
@@ -14,22 +17,27 @@ on:
           - major
 
 concurrency:
-  group: auto-version-bump-main
+  group: auto-version-bump
   cancel-in-progress: false
 
 permissions:
   contents: write
+  pull-requests: write
 
 jobs:
   bump:
-    name: Bump version and tag release
+    name: Open release bump PR
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      BUMP: ${{ inputs.bump }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          token: ${{ github.token }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Node
         uses: actions/setup-node@v4
@@ -41,8 +49,6 @@ jobs:
         run: npm ci
 
       - name: Apply version bump
-        env:
-          BUMP: ${{ inputs.bump }}
         run: npm run version:bump -- "$BUMP"
 
       - name: Verify bumped release
@@ -50,28 +56,37 @@ jobs:
 
       - name: Read next version
         id: release
-        run: |
-          NEXT_VERSION=$(node -p "require('./package.json').version")
-          echo "version=${NEXT_VERSION}" >> "$GITHUB_OUTPUT"
+        run: echo "version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
 
-      - name: Commit and tag
+      - name: Open release PR
         env:
           NEXT: ${{ steps.release.outputs.version }}
         run: |
+          set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          BRANCH="release/v${NEXT}"
+          git checkout -b "$BRANCH"
           git add package.json package-lock.json version.json index.html
-          git commit -m "chore(release): v${NEXT} [skip ci]"
-          git tag "v${NEXT}"
-          git push origin main
-          git push origin "v${NEXT}"
+          git commit -m "chore(release): v${NEXT}"
+          git push -u origin "$BRANCH"
+
+          gh label create release --color FFD166 --description "Automated release bump" 2>/dev/null || true
+          PR_URL=$(gh pr create --base main --head "$BRANCH" \
+            --title "chore(release): v${NEXT}" \
+            --body "Automated version bump to v${NEXT} (\`${BUMP}\`). Auto-merges once CI passes; the Tag Release workflow then tags v${NEXT}." \
+            --label "release")
+          echo "Opened $PR_URL"
+          gh pr merge "$PR_URL" --auto --merge --delete-branch || echo "::warning::auto-merge unavailable; merge the release PR manually"
 
       - name: Summary
+        if: always()
         env:
           NEXT: ${{ steps.release.outputs.version }}
-          BUMP: ${{ inputs.bump }}
         run: |
-          echo "### Version bumped to v${NEXT}" >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "Bump type: \`${BUMP}\`" >> "$GITHUB_STEP_SUMMARY"
-          echo "Tag pushed: \`v${NEXT}\`" >> "$GITHUB_STEP_SUMMARY"
+          {
+            echo "### Release PR opened for v${NEXT}"
+            echo ""
+            echo "It auto-merges once the CI verify check passes; the Tag Release workflow then tags v${NEXT} and creates a GitHub Release."
+          } >> "$GITHUB_STEP_SUMMARY"
