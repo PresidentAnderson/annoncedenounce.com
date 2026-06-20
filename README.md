@@ -57,7 +57,9 @@ npm run version:bump -- minor
 npm run version:bump -- major
 ```
 
-To bump through GitHub Actions, run the **Auto Version Bump** workflow manually. Because `main` is protected (no direct pushes), it updates metadata, reruns verification, and **opens a release PR that auto-merges once the CI verify check passes**. On merge, the **Tag Release** workflow tags `vX.Y.Z` and creates a GitHub Release.
+To bump through GitHub Actions, run the **Auto Version Bump** workflow manually. Because `main` is protected (no direct pushes), it updates metadata, reruns verification, and **opens a release PR**. On merge, the **Tag Release** workflow tags `vX.Y.Z` and creates a GitHub Release.
+
+For fully hands-off releases, add an optional `RELEASE_TOKEN` secret (a fine-grained PAT with `contents:write` + `pull-requests:write`). With it, the release PR triggers CI and **auto-merges** once the verify check passes. Without it, PRs opened by the default `GITHUB_TOKEN` don't trigger CI (GitHub's anti-recursion rule), so the release PR opens but an admin merges it manually.
 
 ### Manual Trigger
 
@@ -73,6 +75,7 @@ Add these to repo Settings → Secrets → Actions:
 |--------|-------------|
 | `OPENAI_API_KEY` | OpenAI API key for Codex agent |
 | `ANTHROPIC_API_KEY` | Anthropic API key for Claude agent |
+| `RELEASE_TOKEN` | _Optional._ Fine-grained PAT (`contents:write` + `pull-requests:write`) enabling CI + auto-merge on release PRs from **Auto Version Bump** |
 
 ## Project Structure
 

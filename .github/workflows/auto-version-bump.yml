@@ -1,8 +1,10 @@
 name: Auto Version Bump
 
 # Branch protection blocks direct pushes to main, so this no longer pushes to main.
-# It opens a release PR that auto-merges once the CI verify check passes; the
-# Tag Release workflow then tags the version on the merge commit.
+# It opens a release PR instead. For FULL automation (CI runs on the PR + auto-merge),
+# add a repo secret RELEASE_TOKEN (a fine-grained PAT with contents:write + pull-requests:write);
+# PRs opened with the default GITHUB_TOKEN do NOT trigger the CI check, so without
+# RELEASE_TOKEN the release PR opens but must be merged manually by an admin.
 on:
   workflow_dispatch:
     inputs:
@@ -30,14 +32,14 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GH_TOKEN: ${{ secrets.RELEASE_TOKEN || secrets.GITHUB_TOKEN }}
       BUMP: ${{ inputs.bump }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.RELEASE_TOKEN || secrets.GITHUB_TOKEN }}
 
       - name: Set up Node
         uses: actions/setup-node@v4
@@ -61,6 +63,7 @@ jobs:
       - name: Open release PR
         env:
           NEXT: ${{ steps.release.outputs.version }}
+          HAS_PAT: ${{ secrets.RELEASE_TOKEN != '' }}
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
@@ -75,10 +78,15 @@ jobs:
           gh label create release --color FFD166 --description "Automated release bump" 2>/dev/null || true
           PR_URL=$(gh pr create --base main --head "$BRANCH" \
             --title "chore(release): v${NEXT}" \
-            --body "Automated version bump to v${NEXT} (\`${BUMP}\`). Auto-merges once CI passes; the Tag Release workflow then tags v${NEXT}." \
+            --body "Automated version bump to v${NEXT} (\`${BUMP}\`). On merge, the Tag Release workflow tags v${NEXT}." \
             --label "release")
           echo "Opened $PR_URL"
-          gh pr merge "$PR_URL" --auto --merge --delete-branch || echo "::warning::auto-merge unavailable; merge the release PR manually"
+
+          if [ "$HAS_PAT" = "true" ]; then
+            gh pr merge "$PR_URL" --auto --merge --delete-branch || echo "::warning::could not enable auto-merge; merge the release PR manually"
+          else
+            echo "::notice::No RELEASE_TOKEN secret set — CI will not run on a GITHUB_TOKEN-created PR, so auto-merge is skipped. An admin should merge ${PR_URL} manually."
+          fi
 
       - name: Summary
         if: always()
