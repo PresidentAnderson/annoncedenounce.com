@@ -1,5 +1,51 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
   "buildCommand": null,
   "outputDirectory": ".",
-  "framework": null
+  "framework": null,
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "functions": {
+    "api/version.js": {
+      "memory": 128,
+      "maxDuration": 5
+    }
+  },
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "has": [{ "type": "host", "value": "annoncedenouncecom.vercel.app" }],
+      "destination": "https://annoncedenounce.com/$1",
+      "permanent": true
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://js.hsforms.net https://js.hsforms.com https://js.hs-scripts.com https://js.hscollectedforms.net https://js.hs-banner.com https://js.usemessages.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://forms.hsforms.com https://api.hsforms.com https://api.hubspot.com https://forms-na1.hsforms.com https://*.hscollectedforms.net https://*.hs-analytics.net; frame-src https://*.hsforms.net https://*.hsforms.com https://app.hsforms.com; base-uri 'self'; form-action 'self' https://*.hsforms.com mailto:; frame-ancestors 'none'; object-src 'none'; upgrade-insecure-requests"
+        },
+        { "key": "Strict-Transport-Security", "value": "max-age=63072000; includeSubDomains" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+        { "key": "Permissions-Policy", "value": "geolocation=(), microphone=(), camera=(), payment=(), interest-cohort=()" },
+        { "key": "Cross-Origin-Opener-Policy", "value": "same-origin" }
+      ]
+    },
+    {
+      "source": "/assets/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=86400, stale-while-revalidate=604800" }
+      ]
+    },
+    {
+      "source": "/api/version",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store, no-cache, must-revalidate, max-age=0" }
+      ]
+    }
+  ]
 }

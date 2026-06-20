@@ -1,3 +1,6 @@
 .vercel
 node_modules
 npm-debug.log*
+
+# Local Claude Code state and agent memory
+.claude/

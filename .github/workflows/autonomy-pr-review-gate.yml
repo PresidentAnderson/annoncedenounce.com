@@ -5,6 +5,10 @@ on:
     types: [opened, edited, synchronize]
     branches: ["main", "master"]
 
+concurrency:
+  group: pr-review-gate-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
   issues: read
@@ -14,6 +18,14 @@ jobs:
   review-gate:
     if: startsWith(github.head_ref, 'agent/')
     runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # Untrusted PR-controlled fields are passed via env and never interpolated
+      # directly into run scripts (prevents shell/script injection).
+      PR_BODY: ${{ github.event.pull_request.body }}
+      PR_TITLE: ${{ github.event.pull_request.title }}
+      BRANCH_NAME: ${{ github.head_ref }}
+      PR_NUMBER: ${{ github.event.pull_request.number }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -22,159 +34,90 @@ jobs:
 
       - name: Validate agent PR
         run: |
+          set -euo pipefail
           echo "🔍 Validating autonomous agent PR..."
-
-          PR_BODY="${{ github.event.pull_request.body }}"
-          PR_TITLE="${{ github.event.pull_request.title }}"
-          BRANCH_NAME="${{ github.head_ref }}"
-
-          # Validation checks
           ERRORS=()
 
-          # Check branch naming convention
           if ! [[ "$BRANCH_NAME" =~ ^agent/(codex|claude|copilot|sparks)/[0-9]+-[a-z0-9-]+$ ]]; then
             ERRORS+=("❌ Invalid branch name format. Expected: agent/{agent_name}/{issue_number}-{slug}")
           fi
-
-          # Check for required PR elements
-          if ! echo "$PR_BODY" | grep -q "Agent Handoff Protocol"; then
+          if ! printf '%s' "$PR_BODY" | grep -q "Agent Handoff Protocol"; then
             ERRORS+=("❌ Missing Agent Handoff Protocol section")
           fi
-
-          if ! echo "$PR_BODY" | grep -q "@claude-code"; then
+          if ! printf '%s' "$PR_BODY" | grep -q "@claude-code"; then
             ERRORS+=("❌ Missing @claude-code handoff mention")
           fi
-
-          if ! echo "$PR_BODY" | grep -q "Closes #[0-9]"; then
+          if ! printf '%s' "$PR_BODY" | grep -q "Closes #[0-9]"; then
             ERRORS+=("❌ Missing 'Closes #issue' reference")
           fi
-
-          if ! echo "$PR_BODY" | grep -q "Review Checklist"; then
+          if ! printf '%s' "$PR_BODY" | grep -q "Review Checklist"; then
             ERRORS+=("❌ Missing Review Checklist")
           fi
-
-          # Check for implementation file
-          ISSUE_NUM=$(echo "$BRANCH_NAME" | grep -o '/[0-9]\+' | cut -d'/' -f2)
-          if [ ! -f "IMPLEMENTATION_$ISSUE_NUM.md" ]; then
+          ISSUE_NUM=$(printf '%s' "$BRANCH_NAME" | grep -o '/[0-9]\+' | cut -d'/' -f2 || echo "")
+          if [ -n "$ISSUE_NUM" ] && [ ! -f "IMPLEMENTATION_$ISSUE_NUM.md" ]; then
             ERRORS+=("❌ Missing implementation file: IMPLEMENTATION_$ISSUE_NUM.md")
           fi
 
-          # Report results
           if [ ${#ERRORS[@]} -gt 0 ]; then
-            echo "🚫 PR validation failed:"
-            printf '%s\n' "${ERRORS[@]}"
-
-            # Comment on PR with validation errors
-            COMMENT="## 🚫 Autonomous PR Validation Failed
-
-          This pull request was created by an autonomous agent but failed validation checks:
-
-          $(printf '%s\n' "${ERRORS[@]}")
-
-          ### Required Actions
-          - Fix the validation errors above
-          - Ensure proper agent handoff protocol is followed
-          - Re-run the autonomous workflow if needed
-
-          ### Sovereign Canon Requirements
-          - Branch name must follow: \`agent/{agent_name}/{issue_number}-{slug}\`
-          - PR body must include Agent Handoff Protocol section
-          - Must reference Claude for review: \`@claude-code\`
-          - Must include \`Closes #issue\` reference
-          - Must include Review Checklist
-          - Must include implementation documentation
-
-          🤖 Automated validation by Sovereign Autonomous System"
-
-            gh pr comment "${{ github.event.pull_request.number }}" --body "$COMMENT"
+            {
+              echo "## 🚫 Autonomous PR Validation Failed"
+              echo ""
+              printf '%s\n' "${ERRORS[@]}"
+            } > comment.md
+            gh pr comment "$PR_NUMBER" --body-file comment.md
             exit 1
-          else
-            echo "✅ PR validation passed"
-
-            # Add success comment and labels
-            COMMENT="## ✅ Autonomous PR Validation Passed
-
-          This pull request was created by an autonomous agent and has passed all validation checks.
-
-          ### Validation Results
-          - ✅ Branch naming convention followed
-          - ✅ Agent handoff protocol included
-          - ✅ Claude review requested
-          - ✅ Issue reference included
-          - ✅ Review checklist provided
-          - ✅ Implementation documentation present
-
-          **Ready for Claude review and merge approval.**
-
-          🤖 Automated validation by Sovereign Autonomous System"
-
-            gh pr comment "${{ github.event.pull_request.number }}" --body "$COMMENT"
-            gh pr edit "${{ github.event.pull_request.number }}" --add-label "agent:validated"
           fi
 
-      - name: Auto-assign Claude for review
+          echo "✅ PR validation passed"
+          printf '## ✅ Autonomous PR Validation Passed\n\nReady for human review and merge approval.\n' > comment.md
+          gh pr comment "$PR_NUMBER" --body-file comment.md
+          gh pr edit "$PR_NUMBER" --add-label "agent:validated"
+
+      - name: Request human review
         if: success()
         run: |
-          # Add Claude as reviewer if available
-          echo "🔔 Requesting Claude review..."
-
-          # Note: This would ideally assign @claude-code if it were a GitHub user
-          # For now, we rely on the @claude-code mention in the PR body
-
-          gh pr edit "${{ github.event.pull_request.number }}" --add-label "review:claude-required"
-
-          echo "✅ Claude review requested via label and mention"
+          set -euo pipefail
+          gh pr edit "$PR_NUMBER" --add-label "review:claude-required"
 
   security-scan:
     if: startsWith(github.head_ref, 'agent/')
     runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      PR_NUMBER: ${{ github.event.pull_request.number }}
+      BASE_REF: ${{ github.base_ref }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Security scan for autonomous changes
         run: |
-          echo "🔒 Performing security scan on autonomous changes..."
-
-          # Check for potential security issues in agent-generated code
+          set -euo pipefail
+          echo "🔒 Scanning autonomous changes..."
+          git fetch origin "$BASE_REF" --depth=0 || git fetch origin "$BASE_REF" || true
+          DIFF=$(git diff "origin/$BASE_REF...HEAD" || git diff "HEAD~1...HEAD" || echo "")
           SECURITY_ISSUES=()
 
-          # Scan for hardcoded secrets
-          if git diff HEAD~1..HEAD | grep -iE "(password|secret|key|token)" | grep -v "GITHUB_TOKEN"; then
+          if printf '%s' "$DIFF" | grep -iE "(password|secret|api[_-]?key|token)" | grep -v "GITHUB_TOKEN" | grep -q .; then
             SECURITY_ISSUES+=("⚠️ Potential hardcoded credentials detected")
           fi
-
-          # Check for dangerous commands
-          if git diff HEAD~1..HEAD | grep -E "(rm -rf|sudo|curl.*sh|eval|exec)"; then
+          if printf '%s' "$DIFF" | grep -E "(rm -rf|sudo |curl.*\| *sh|eval |exec )" | grep -q .; then
             SECURITY_ISSUES+=("⚠️ Potentially dangerous commands detected")
           fi
 
-          # Check for external network calls
-          if git diff HEAD~1..HEAD | grep -E "(http://|https://)" | grep -v "github.com\|sovereign"; then
-            SECURITY_ISSUES+=("⚠️ External network calls detected")
-          fi
-
-          # Report security scan results
           if [ ${#SECURITY_ISSUES[@]} -gt 0 ]; then
-            echo "🚨 Security issues detected:"
-            printf '%s\n' "${SECURITY_ISSUES[@]}"
-
-            COMMENT="## 🚨 Security Scan Alert
-
-          Security scan detected potential issues in this autonomous PR:
-
-          $(printf '%s\n' "${SECURITY_ISSUES[@]}")
-
-          ### Required Actions
-          - Manual security review required before merge
-          - Verify all changes are legitimate and safe
-          - Remove any hardcoded credentials or dangerous operations
-
-          🔒 Automated security scan by Sovereign Autonomous System"
-
-            gh pr comment "${{ github.event.pull_request.number }}" --body "$COMMENT"
-            gh pr edit "${{ github.event.pull_request.number }}" --add-label "security:review-required"
+            {
+              echo "## 🚨 Security Scan Alert"
+              echo ""
+              printf '%s\n' "${SECURITY_ISSUES[@]}"
+              echo ""
+              echo "Manual security review required before merge."
+            } > scan.md
+            gh pr comment "$PR_NUMBER" --body-file scan.md
+            gh pr edit "$PR_NUMBER" --add-label "security:review-required"
           else
             echo "✅ Security scan passed"
-            gh pr edit "${{ github.event.pull_request.number }}" --add-label "security:cleared"
+            gh pr edit "$PR_NUMBER" --add-label "security:cleared"
           fi

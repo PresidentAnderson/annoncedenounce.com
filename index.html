@@ -5,17 +5,59 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Annonce Dénonce | Dénoncer. Être entendu.</title>
   <meta name="description" content="Annonce Dénonce est une plateforme en préparation pour signaler, documenter et rendre visibles les manquements d'intérêt public." />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#071017" />
   <link rel="canonical" href="https://annoncedenounce.com" />
-  <meta property="og:title" content="Annonce Dénonce" />
-  <meta property="og:description" content="Une plateforme pour donner une voix : signaler, documenter et rendre visibles les manquements. Announce. Denounce. Be heard." />
+  <meta property="og:site_name" content="Annonce Dénonce" />
+  <meta property="og:locale" content="fr_CA" />
+  <meta property="og:title" content="Annonce Dénonce — Dénoncer. Être entendu." />
+  <meta property="og:description" content="Une plateforme pour signaler, documenter et rendre visibles les manquements d'intérêt public." />
   <meta property="og:url" content="https://annoncedenounce.com" />
   <meta property="og:type" content="website" />
   <meta property="og:image" content="https://annoncedenounce.com/assets/hero-dossier.png" />
+  <meta property="og:image:width" content="1800" />
+  <meta property="og:image:height" content="1100" />
+  <meta property="og:image:alt" content="Dossier illustrant la mission d'Annonce Dénonce." />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Annonce Dénonce — Dénoncer. Être entendu." />
+  <meta name="twitter:description" content="Une plateforme pour signaler, documenter et rendre visibles les manquements d'intérêt public." />
+  <meta name="twitter:image" content="https://annoncedenounce.com/assets/hero-dossier.png" />
+  <meta name="twitter:image:alt" content="Dossier illustrant la mission d'Annonce Dénonce." />
   <link rel="icon" href="assets/favicon.png" type="image/png" />
+  <link rel="apple-touch-icon" href="assets/favicon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet" />
-  <script charset="utf-8" type="text/javascript" src="https://js.hsforms.net/forms/embed/v2.js" defer></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://annoncedenounce.com/#org",
+        "name": "Annonce Dénonce",
+        "url": "https://annoncedenounce.com",
+        "logo": "https://annoncedenounce.com/assets/favicon.png",
+        "description": "Plateforme pour signaler, documenter et rendre visibles les manquements d'intérêt public.",
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "email": "contact@annoncedenounce.com",
+          "contactType": "customer support",
+          "availableLanguage": ["French", "English"]
+        }
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://annoncedenounce.com/#website",
+        "url": "https://annoncedenounce.com",
+        "name": "Annonce Dénonce",
+        "inLanguage": "fr",
+        "publisher": { "@id": "https://annoncedenounce.com/#org" }
+      }
+    ]
+  }
+  </script>
   <style>
     :root {
       --bg: #071017;
@@ -67,8 +109,8 @@
       inset: 0;
       z-index: -1;
       background:
-        linear-gradient(180deg, rgba(7, 16, 23, .54) 0%, rgba(7, 16, 23, .82) 48%, #071017 78%),
-        linear-gradient(90deg, rgba(7, 16, 23, .38), rgba(7, 16, 23, .14) 50%, rgba(7, 16, 23, .42));
+        linear-gradient(180deg, rgba(7, 16, 23, .72) 0%, rgba(7, 16, 23, .88) 48%, #071017 78%),
+        linear-gradient(90deg, rgba(7, 16, 23, .46), rgba(7, 16, 23, .2) 50%, rgba(7, 16, 23, .5));
     }
 
     a {
@@ -161,7 +203,11 @@
     .nav-links a:focus-visible {
       background: rgba(255, 255, 255, .08);
       color: var(--ink);
-      outline: none;
+    }
+
+    .nav-links a:focus-visible {
+      outline: 2px solid var(--teal);
+      outline-offset: 3px;
     }
 
     main {
@@ -246,7 +292,15 @@
     .btn:hover,
     .btn:focus-visible {
       transform: translateY(-2px);
-      outline: none;
+    }
+
+    .btn:focus-visible {
+      outline: 2px solid var(--gold);
+      outline-offset: 3px;
+    }
+
+    .btn:active {
+      transform: translateY(0);
     }
 
     .btn-primary {
@@ -477,6 +531,12 @@
       color: var(--quiet);
     }
 
+    .signup input:focus-visible {
+      outline: 2px solid var(--gold);
+      outline-offset: 2px;
+      border-color: rgba(255, 255, 255, .4);
+    }
+
     .form-status {
       min-height: 24px;
       color: var(--gold);
@@ -518,6 +578,14 @@
       color: #fff !important;
       font-weight: 800 !important;
       cursor: pointer !important;
+    }
+
+    .hs-form input:focus-visible,
+    .hs-form textarea:focus-visible,
+    .hs-form select:focus-visible,
+    .hs-button:focus-visible {
+      outline: 2px solid var(--gold) !important;
+      outline-offset: 2px !important;
     }
 
     .submitted-message {
@@ -599,6 +667,196 @@
       color: #9ca3af;
     }
 
+    .trust {
+      padding: 18px 0;
+      background: var(--bg-2);
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .trust-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 14px;
+      list-style: none;
+    }
+
+    .trust-row li {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      background: rgba(78, 205, 196, .08);
+      color: var(--teal);
+      font-size: .9rem;
+      font-weight: 700;
+    }
+
+    .trust-row li::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      flex: 0 0 8px;
+      border-radius: 50%;
+      background: var(--teal);
+    }
+
+    .form-note {
+      margin-top: 10px;
+      color: var(--quiet);
+      font-size: .85rem;
+    }
+
+    .form-note a {
+      color: var(--teal);
+      text-decoration: underline;
+    }
+
+    .copy-mail {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .copy-mail a {
+      color: var(--gold);
+      font-weight: 800;
+      overflow-wrap: anywhere;
+    }
+
+    .copy-mail button {
+      padding: 6px 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .06);
+      color: var(--ink);
+      font: 600 .8rem inherit;
+      cursor: pointer;
+    }
+
+    .copy-mail button:focus-visible {
+      outline: 2px solid var(--gold);
+      outline-offset: 2px;
+    }
+
+    .foot-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) repeat(2, minmax(0, 1fr));
+      gap: 24px;
+      align-items: start;
+    }
+
+    .foot-grid h4 {
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-size: .82rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+
+    .foot-links {
+      display: grid;
+      gap: 6px;
+      list-style: none;
+    }
+
+    .foot-links a:hover,
+    .foot-links a:focus-visible {
+      color: var(--ink);
+      text-decoration: underline;
+    }
+
+    .foot-links a:focus-visible {
+      outline: 2px solid var(--teal);
+      outline-offset: 3px;
+    }
+
+    .foot-bottom {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 22px;
+      padding-top: 16px;
+      border-top: 1px solid var(--line);
+    }
+
+    .consent {
+      position: fixed;
+      left: 50%;
+      bottom: 20px;
+      z-index: 100000;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 12px 18px;
+      width: min(94vw, 640px);
+      padding: 16px 18px;
+      border: 1px solid rgba(255, 255, 255, .14);
+      border-radius: 8px;
+      background: #0a141b;
+      box-shadow: 0 18px 50px -18px rgba(0, 0, 0, .7);
+      color: var(--ink);
+      font-size: .92rem;
+    }
+
+    .consent p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .consent a {
+      color: var(--teal);
+      text-decoration: underline;
+    }
+
+    .consent-actions {
+      display: flex;
+      flex-shrink: 0;
+      gap: 8px;
+    }
+
+    .consent button {
+      min-height: 42px;
+      padding: 9px 16px;
+      border-radius: 8px;
+      font: 700 .9rem inherit;
+      cursor: pointer;
+    }
+
+    .consent button:focus-visible {
+      outline: 2px solid var(--gold);
+      outline-offset: 2px;
+    }
+
+    .consent-accept {
+      border: 0;
+      background: var(--teal);
+      color: #04201d;
+    }
+
+    .consent-decline {
+      border: 1px solid rgba(255, 255, 255, .2);
+      background: transparent;
+      color: var(--muted);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+
+      *,
+      *::before,
+      *::after {
+        animation-duration: .001ms !important;
+        transition-duration: .001ms !important;
+      }
+    }
+
     [hidden] {
       display: none !important;
     }
@@ -670,19 +928,37 @@
       .process-item {
         padding: 20px;
       }
+
+      .foot-grid {
+        grid-template-columns: 1fr;
+        gap: 18px;
+      }
+
+      .consent {
+        grid-template-columns: 1fr;
+      }
+
+      .consent-actions {
+        width: 100%;
+      }
+
+      .consent-actions button {
+        flex: 1;
+      }
     }
   </style>
 </head>
-<body data-site-version="0.2.0">
+<body data-site-version="0.3.0">
   <a class="skip" href="#main">Aller au contenu</a>
+  <a class="skip" href="#contact">Aller au formulaire</a>
 
   <header>
-    <div class="wrap nav" aria-label="Navigation principale">
-      <a class="brand" href="#top" aria-label="Annonce Dénonce">
+    <div class="wrap nav">
+      <a class="brand" href="#top" aria-label="Annonce Dénonce, retour en haut">
         <span class="mark" aria-hidden="true">AD</span>
         <span>Annonce Dénonce</span>
       </a>
-      <nav class="nav-links" aria-label="Sections">
+      <nav class="nav-links" aria-label="Navigation principale">
         <a href="#what">Mission</a>
         <a href="#how">Processus</a>
         <a href="#contact">Contact</a>
@@ -691,11 +967,11 @@
   </header>
 
   <main id="main">
-    <section class="hero" id="top">
+    <section class="hero" id="top" aria-labelledby="hero-heading">
       <div class="wrap">
         <div class="hero-copy">
           <p class="eyebrow">Bientôt en ligne</p>
-          <h1>Dénoncer. <span class="accent">Être entendu.</span></h1>
+          <h1 id="hero-heading">Dénoncer. <span class="accent">Être entendu.</span></h1>
           <p class="lead">
             Une plateforme pour donner une voix : signaler, documenter et rendre visibles les manquements.
             <strong>Announce. Denounce. Be heard.</strong>
@@ -713,12 +989,23 @@
       </div>
     </section>
 
-    <section class="section" id="what">
+    <section class="trust" aria-label="Engagements de confiance">
+      <div class="wrap">
+        <ul class="trust-row">
+          <li>Connexion chiffrée (HTTPS)</li>
+          <li>Vous restez maître de votre identité</li>
+          <li>Aucun témoin sans votre consentement</li>
+          <li>Intérêt public, pas profit</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section" id="what" aria-labelledby="what-heading">
       <div class="wrap">
         <div class="section-head">
           <div>
             <p class="section-kicker">Mission</p>
-            <h2>Rendre les faits visibles sans perdre la voix humaine.</h2>
+            <h2 id="what-heading">Rendre les faits visibles sans perdre la voix humaine.</h2>
           </div>
           <p>
             Annonce Dénonce prépare un espace sobre et utile pour les personnes qui doivent signaler un manquement,
@@ -726,32 +1013,32 @@
           </p>
         </div>
 
-        <div class="grid-3">
-          <article class="card">
+        <div class="grid-3" role="list">
+          <div class="card" role="listitem">
             <span class="card-number">01</span>
             <h3>Signaler</h3>
             <p>Donnez l'alerte avec un parcours clair, pensé pour distinguer les faits, les dates, les personnes concernées et les documents disponibles.</p>
-          </article>
-          <article class="card">
+          </div>
+          <div class="card" role="listitem">
             <span class="card-number">02</span>
             <h3>Documenter</h3>
             <p>Conservez les éléments importants dans une chronologie organisée afin de faciliter la compréhension, la vérification et le suivi.</p>
-          </article>
-          <article class="card">
+          </div>
+          <div class="card" role="listitem">
             <span class="card-number">03</span>
             <h3>Protéger</h3>
             <p>Mettre la sécurité, la prudence et la dignité au centre du signalement : la voix protégée, l'intérêt public servi.</p>
-          </article>
+          </div>
         </div>
       </div>
     </section>
 
-    <section class="section alt" id="how">
+    <section class="section alt" id="how" aria-labelledby="how-heading">
       <div class="wrap">
         <div class="section-head">
           <div>
-            <p class="section-kicker">Processus</p>
-            <h2>Une méthode simple pour passer du vécu au dossier.</h2>
+            <p class="section-kicker">Processus · à venir</p>
+            <h2 id="how-heading">Une méthode simple pour passer du vécu au dossier.</h2>
           </div>
           <p>
             Le produit complet est en construction. La première version se concentre sur l'inscription au lancement,
@@ -759,65 +1046,74 @@
           </p>
         </div>
 
-        <div class="process">
-          <article class="process-item">
+        <div class="process" role="list">
+          <div class="process-item" role="listitem">
             <span class="step">1</span>
             <div>
               <h3>Décrire</h3>
               <p>Clarifier ce qui s'est passé, où, quand et pourquoi cela mérite attention.</p>
             </div>
-          </article>
-          <article class="process-item">
+          </div>
+          <div class="process-item" role="listitem">
             <span class="step">2</span>
             <div>
               <h3>Assembler</h3>
               <p>Joindre les preuves, organiser les dates et repérer les pièces manquantes.</p>
             </div>
-          </article>
-          <article class="process-item">
+          </div>
+          <div class="process-item" role="listitem">
             <span class="step">3</span>
             <div>
               <h3>Évaluer</h3>
               <p>Identifier les risques, les destinataires possibles et les précautions nécessaires.</p>
             </div>
-          </article>
-          <article class="process-item">
+          </div>
+          <div class="process-item" role="listitem">
             <span class="step">4</span>
             <div>
               <h3>Suivre</h3>
               <p>Garder une trace des démarches, des réponses et des prochaines actions.</p>
             </div>
-          </article>
+          </div>
         </div>
       </div>
     </section>
 
-    <section class="contact" id="contact">
+    <section class="contact" id="contact" aria-labelledby="contact-heading">
       <div class="wrap">
         <div class="contact-panel">
           <div>
             <p class="section-kicker">Lancement</p>
-            <h2>Faites entendre votre voix.</h2>
+            <h2 id="contact-heading">Faites entendre votre voix.</h2>
             <p>
               Inscrivez-vous pour être informé du lancement, proposer une collaboration ou transmettre une demande initiale.
             </p>
             <ul class="contact-list">
               <li>Français et anglais acceptés.</li>
-              <li>Ne transmettez pas encore de documents sensibles par ce formulaire public.</li>
+              <li>Ce formulaire n'est pas un canal sécurisé. Ne transmettez aucun document ni aucun renseignement identifiant une personne.</li>
+              <li>Votre courriel peut identifier votre employeur ou votre contexte : utilisez une adresse personnelle si vous le souhaitez.</li>
               <li>Pour une demande directe : <a class="direct-mail" href="mailto:contact@annoncedenounce.com">contact@annoncedenounce.com</a></li>
             </ul>
           </div>
 
           <div class="form-shell">
             <h3>Être avisé du lancement</h3>
-            <p>Le formulaire HubSpot se chargera ici. Si rien n'apparaît, utilisez l'option courriel.</p>
+            <p id="form-intro">Indiquez votre courriel pour être avisé du lancement. Rien d'autre n'est requis.</p>
             <div id="hubspot-form" aria-live="polite"></div>
-            <form class="signup" id="fallback-form" hidden>
+            <form class="signup" id="fallback-form">
               <label for="email">Votre courriel</label>
-              <input id="email" type="email" required placeholder="vous@exemple.com" autocomplete="email" />
+              <input id="email" type="email" required placeholder="vous@exemple.com" autocomplete="email" inputmode="email" />
               <button class="btn btn-primary" type="submit">M'aviser</button>
               <p class="form-status" id="form-status" aria-live="polite"></p>
             </form>
+            <p class="copy-mail">
+              <a href="mailto:contact@annoncedenounce.com" id="contact-mail">contact@annoncedenounce.com</a>
+              <button type="button" id="copy-mail-btn" aria-label="Copier l'adresse courriel">Copier</button>
+            </p>
+            <p class="form-note">
+              Votre courriel sert uniquement à vous aviser du lancement. Pas de partage, pas de pourriel.
+              Voir la <a href="/privacy">politique de confidentialité</a>.
+            </p>
           </div>
         </div>
       </div>
@@ -825,11 +1121,44 @@
   </main>
 
   <footer>
-    <div class="wrap foot">
-      <div>© <span id="year"></span> Annonce Dénonce</div>
-      <div><span id="site-version">v0.2.0</span> · annoncedenounce.com</div>
+    <div class="wrap">
+      <div class="foot-grid">
+        <div>
+          <p class="brand"><span class="mark" aria-hidden="true">AD</span><span>Annonce Dénonce</span></p>
+          <p class="form-note">Une initiative indépendante d'AXAI Innovations pour signaler, documenter et rendre visibles les manquements d'intérêt public.</p>
+        </div>
+        <nav aria-label="Liens légaux">
+          <h4>Légal</h4>
+          <ul class="foot-links">
+            <li><a href="/privacy">Politique de confidentialité</a></li>
+          </ul>
+        </nav>
+        <nav aria-label="Coordonnées">
+          <h4>Contact</h4>
+          <ul class="foot-links">
+            <li><a href="mailto:contact@annoncedenounce.com">contact@annoncedenounce.com</a></li>
+            <li>Français · English</li>
+          </ul>
+        </nav>
+      </div>
+      <div class="foot-bottom">
+        <div>© <span id="year"></span> Annonce Dénonce</div>
+        <div><span id="site-version">v0.3.0</span> · annoncedenounce.com</div>
+      </div>
     </div>
   </footer>
+
+  <div id="consent-banner" class="consent" role="dialog" aria-live="polite" aria-label="Consentement aux témoins" hidden>
+    <p>
+      Nous utilisons des témoins uniquement pour faire fonctionner le formulaire d'inscription (HubSpot).
+      Sans consentement, vous pouvez tout de même nous écrire par courriel.
+      <a href="/privacy">En savoir plus</a>.
+    </p>
+    <span class="consent-actions">
+      <button type="button" class="consent-accept" id="consent-accept">Accepter</button>
+      <button type="button" class="consent-decline" id="consent-decline">Refuser</button>
+    </span>
+  </div>
 
   <script>
     document.getElementById("year").textContent = new Date().getFullYear();
@@ -837,54 +1166,115 @@
 
   <script>
     (function () {
+      // HubSpot lead capture, gated behind explicit cookie consent (Loi 25 / RGPD).
+      // Before launch, replace HUBSPOT_FORM_ID with the real form GUID from portal 43986063.
+      var HUBSPOT_PORTAL_ID = "43986063";
+      var HUBSPOT_FORM_ID = "waitlist-annoncedenouncecom";
+      var CONSENT_KEY = "ad-consent";
+      var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
       var fallback = document.getElementById("fallback-form");
       var slot = document.getElementById("hubspot-form");
       var status = document.getElementById("form-status");
+      var emailInput = document.getElementById("email");
+      var intro = document.getElementById("form-intro");
+      var banner = document.getElementById("consent-banner");
+      var hsRequested = false;
 
-      function showFallback() {
-        if (!fallback || fallback.hidden === false) return;
-        var loaded = slot && (slot.querySelector("form") || slot.querySelector("iframe"));
-        if (!loaded) fallback.hidden = false;
+      function readConsent() {
+        try { return window.localStorage.getItem(CONSENT_KEY); } catch (e) { return null; }
+      }
+      function writeConsent(value) {
+        try { window.localStorage.setItem(CONSENT_KEY, value); } catch (e) {}
       }
 
-      function bootHubSpot() {
-        if (!window.hbspt || !window.hbspt.forms || !slot) {
-          showFallback();
+      function injectHubSpotScript(onReady) {
+        if (window.hbspt && window.hbspt.forms) { onReady(); return; }
+        if (document.getElementById("hs-embed-script")) {
+          var wait = setInterval(function () {
+            if (window.hbspt && window.hbspt.forms) { clearInterval(wait); onReady(); }
+          }, 200);
           return;
         }
-
-        try {
-          window.hbspt.forms.create({
-            portalId: "43986063",
-            formId: "waitlist-annoncedenouncecom",
-            region: "na1",
-            target: "#hubspot-form",
-            onFormReady: function () {
-              if (fallback) fallback.hidden = true;
-            },
-            onFormSubmitted: function () {
-              if (status) status.textContent = "Merci, nous vous écrirons.";
-            }
-          });
-        } catch (error) {
-          showFallback();
-        }
+        var s = document.createElement("script");
+        s.id = "hs-embed-script";
+        s.src = "https://js.hsforms.net/forms/embed/v2.js";
+        s.async = true;
+        s.onload = onReady;
+        s.onerror = function () { /* keep the e-mail fallback visible */ };
+        document.head.appendChild(s);
       }
 
-      if (fallback) {
-        fallback.addEventListener("submit", function (event) {
-          event.preventDefault();
-          var email = document.getElementById("email").value.trim();
-          var subject = encodeURIComponent("Inscription au lancement Annonce Denonce");
-          var body = encodeURIComponent("Bonjour,\n\nJe souhaite etre avise du lancement d'Annonce Denonce.\n\nCourriel : " + email);
-          window.location.href = "mailto:contact@annoncedenounce.com?subject=" + subject + "&body=" + body;
-          if (status) status.textContent = "Votre application courriel va s'ouvrir pour confirmer l'inscription.";
+      function loadHubSpot() {
+        if (hsRequested || !slot) return;
+        hsRequested = true;
+        injectHubSpotScript(function () {
+          if (!window.hbspt || !window.hbspt.forms) return;
+          try {
+            window.hbspt.forms.create({
+              portalId: HUBSPOT_PORTAL_ID,
+              formId: HUBSPOT_FORM_ID,
+              region: "na1",
+              target: "#hubspot-form",
+              onFormReady: function () {
+                if (fallback) fallback.hidden = true;
+                if (intro) intro.textContent = "Inscrivez-vous pour être avisé du lancement.";
+              }
+            });
+          } catch (error) { /* keep the e-mail fallback visible */ }
         });
       }
 
+      function hideBanner() {
+        if (banner) banner.hidden = true;
+      }
+
+      // Copy-to-clipboard for the direct contact address.
+      var copyBtn = document.getElementById("copy-mail-btn");
+      if (copyBtn) {
+        copyBtn.addEventListener("click", function () {
+          var addr = "contact@annoncedenounce.com";
+          var done = function () { copyBtn.textContent = "Copié"; setTimeout(function () { copyBtn.textContent = "Copier"; }, 2000); };
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(addr).then(done, function () {});
+          } else {
+            done();
+          }
+        });
+      }
+
+      // First-party e-mail fallback (no cookies, no third party).
+      if (fallback) {
+        fallback.addEventListener("submit", function (event) {
+          event.preventDefault();
+          var email = (emailInput ? emailInput.value : "").trim();
+          if (!EMAIL_RE.test(email)) {
+            if (status) status.textContent = "Veuillez saisir une adresse courriel valide.";
+            if (emailInput) emailInput.focus();
+            return;
+          }
+          var subject = encodeURIComponent("Inscription au lancement Annonce Denonce");
+          var body = encodeURIComponent("Bonjour,\n\nJe souhaite etre avise du lancement d'Annonce Denonce.\n\nCourriel : " + email);
+          window.location.href = "mailto:contact@annoncedenounce.com?subject=" + subject + "&body=" + body;
+          if (status) status.textContent = "Si votre application courriel ne s'ouvre pas, écrivez directement à contact@annoncedenounce.com (bouton « Copier » ci-dessous).";
+        });
+      }
+
+      // Consent wiring.
+      if (banner) {
+        var accept = document.getElementById("consent-accept");
+        var decline = document.getElementById("consent-decline");
+        if (accept) accept.addEventListener("click", function () { writeConsent("granted"); hideBanner(); loadHubSpot(); });
+        if (decline) decline.addEventListener("click", function () { writeConsent("denied"); hideBanner(); });
+      }
+
       window.addEventListener("load", function () {
-        setTimeout(bootHubSpot, 250);
-        setTimeout(showFallback, 3000);
+        var consent = readConsent();
+        if (consent === "granted") {
+          loadHubSpot();
+        } else if (consent !== "denied" && banner) {
+          banner.hidden = false;
+        }
       });
     })();
   </script>
@@ -903,6 +1293,8 @@
       var dismissed = null;
       var el = null;
 
+      try { dismissed = window.sessionStorage.getItem("ad-version-dismissed"); } catch (e) {}
+
       function show(commit) {
         if (el) return;
 
@@ -913,7 +1305,7 @@
 
         var copy = document.createElement("span");
         copy.className = "version-banner-copy";
-        copy.innerHTML = "<span>A new version of the site is available.</span><small>Updating takes less than 5 seconds.</small>";
+        copy.innerHTML = "<span>Une nouvelle version du site est disponible.</span><small>La mise à jour prend moins de 5 secondes.</small>";
 
         var actions = document.createElement("span");
         actions.className = "version-banner-actions";
@@ -921,7 +1313,7 @@
         var update = document.createElement("button");
         update.type = "button";
         update.className = "version-update";
-        update.textContent = "Update";
+        update.textContent = "Mettre à jour";
         update.onclick = function () {
           window.location.reload();
         };
@@ -929,9 +1321,10 @@
         var later = document.createElement("button");
         later.type = "button";
         later.className = "version-later";
-        later.textContent = "Later";
+        later.textContent = "Plus tard";
         later.onclick = function () {
           dismissed = commit;
+          try { window.sessionStorage.setItem("ad-version-dismissed", commit); } catch (e) {}
           if (el) {
             el.remove();
             el = null;
@@ -969,5 +1362,10 @@
       window.addEventListener("focus", check);
     })();
   </script>
+
+  <!-- Vercel Web Analytics + Speed Insights (cookieless, first-party). Enable both in the Vercel dashboard. -->
+  <script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
+  <script defer src="/_vercel/insights/script.js"></script>
+  <script defer src="/_vercel/speed-insights/script.js"></script>
 </body>
 </html>
