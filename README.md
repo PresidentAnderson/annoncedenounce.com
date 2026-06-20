@@ -138,4 +138,6 @@ To add custom domain:
 
 **Powered by [Sovereign Autonomy Pack](https://github.com/PresidentAnderson/sovereign-autonomy-pack)**
 
-© 2026 AXAI Innovations
+Une initiative indépendante de Justice Sans Frontières Canada et de Jonathan Anderson.
+
+© 2026 Justice Sans Frontières Canada · Jonathan Anderson
