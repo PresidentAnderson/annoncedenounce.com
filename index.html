@@ -148,6 +148,58 @@
       top: 16px;
     }
 
+    .safety-notice {
+      position: relative;
+      z-index: 3;
+      border-bottom: 1px solid rgba(244, 91, 105, .4);
+      background: rgba(200, 61, 75, .16);
+    }
+
+    .safety-inner {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 6px 12px;
+      padding: 12px 0;
+      color: var(--ink);
+      font-size: .96rem;
+      font-weight: 600;
+    }
+
+    .safety-inner strong {
+      color: var(--ink);
+      font-weight: 800;
+    }
+
+    .safety-inner .safety-tag {
+      flex: 0 0 auto;
+      align-self: center;
+      padding: 3px 9px;
+      border-radius: 6px;
+      background: var(--brand);
+      color: #fff;
+      font-size: .72rem;
+      font-weight: 800;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+
+    .safety-inner a {
+      color: var(--gold);
+      font-weight: 800;
+      text-decoration: underline;
+    }
+
+    .safety-inner a:focus-visible {
+      outline: 2px solid var(--gold);
+      outline-offset: 3px;
+    }
+
+    .safety-en {
+      color: var(--muted);
+      font-weight: 600;
+    }
+
     header {
       position: relative;
       z-index: 2;
@@ -951,6 +1003,17 @@
 <body data-site-version="0.3.4">
   <a class="skip" href="#main">Aller au contenu</a>
   <a class="skip" href="#contact">Aller au formulaire</a>
+
+  <aside class="safety-notice" role="note" aria-label="Sécurité immédiate">
+    <div class="wrap safety-inner">
+      <span class="safety-tag">Urgence</span>
+      <span>
+        <strong>En cas de danger immédiat, appelez le 911</strong> (ou les services d'urgence de votre région).
+        Annonce Dénonce n'est pas un service d'urgence et ne remplace pas la police ni les secours.
+      </span>
+      <span class="safety-en">If you are in immediate danger, call 911 or your local emergency services.</span>
+    </div>
+  </aside>
 
   <header>
     <div class="wrap nav">
