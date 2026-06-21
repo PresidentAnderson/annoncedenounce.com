@@ -46,6 +46,7 @@ function createStaticServer() {
       "/privacy.html": "privacy.html",
       "/assets/favicon.png": "assets/favicon.png",
       "/assets/hero-dossier.png": "assets/hero-dossier.png",
+      "/assets/og-cover.png": "assets/og-cover.png",
     };
     const file = map[url.pathname];
     if (!file) {
@@ -81,6 +82,7 @@ async function verifyStaticServer() {
       "/privacy",
       "/assets/favicon.png",
       "/assets/hero-dossier.png",
+      "/assets/og-cover.png",
     ]) {
       const result = await request(server, path);
       assert.equal(result.status, 200, `${path} must return HTTP 200`);
@@ -138,6 +140,25 @@ function verifyFilesAndVersion() {
   assert.ok(html.includes('name="twitter:card"'), "twitter card metadata must exist");
   assert.ok(html.includes("application/ld+json"), "structured data (JSON-LD) must exist");
   assert.ok(html.includes('rel="manifest"'), "web manifest link must exist");
+  assert.ok(
+    html.includes('hreflang="fr-CA"') && html.includes('hreflang="x-default"'),
+    "index.html must declare hreflang alternates (fr-CA + x-default)"
+  );
+  assert.ok(
+    html.includes('content="https://annoncedenounce.com/assets/og-cover.png"'),
+    "og:image must point to the 1200x630 og-cover asset"
+  );
+  assert.ok(
+    html.includes('property="og:image:width" content="1200"') &&
+      html.includes('property="og:image:height" content="630"'),
+    "og:image must declare the standard 1200x630 dimensions"
+  );
+
+  const privacy = readText("privacy.html");
+  assert.ok(
+    privacy.includes('hreflang="fr-CA"') && privacy.includes('hreflang="x-default"'),
+    "privacy.html must declare hreflang alternates (fr-CA + x-default)"
+  );
   assert.ok(!html.includes("A new version of the site is available"), "version banner must be localized (no English copy)");
   assert.ok(!/TODO|placeholder text|IMPLEMENTATION_\d+/.test(html), "index.html must not ship placeholders");
 
@@ -162,6 +183,7 @@ function verifyFilesAndVersion() {
     "api/version.js",
     "assets/favicon.png",
     "assets/hero-dossier.png",
+    "assets/og-cover.png",
     "robots.txt",
     "sitemap.xml",
     "site.webmanifest",
