@@ -8,6 +8,7 @@ This repository follows the same operating shape as the stronger AXAI/sovereign 
 - Delivery workflow: Sovereign Autonomy Pack `1.0.0`
 - Reference implementation patterns: `juge.ca`
 - Local lock file: `canon.lock.yaml`
+- Operator-blocked work: `docs/OPERATOR_ACTION_QUEUE.md` (mirror of `juge.ca#410`)
 
 ## Required Change Procedure
 
