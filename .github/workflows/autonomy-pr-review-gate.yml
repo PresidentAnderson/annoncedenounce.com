@@ -16,7 +16,12 @@ permissions:
 
 jobs:
   review-gate:
-    if: startsWith(github.head_ref, 'agent/')
+    # Match both the canonical `agent/` prefix and bare `codex/` branches.
+    # Codex PRs land on `codex/*` (not `agent/codex/*`) and would otherwise
+    # bypass this gate entirely — the path that let a regression branch reach
+    # merge unreviewed (see issue #499). They still fail the branch-name
+    # validation below, which is intended: it forces them through the gate.
+    if: startsWith(github.head_ref, 'agent/') || startsWith(github.head_ref, 'codex/')
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -80,7 +85,9 @@ jobs:
           gh pr edit "$PR_NUMBER" --add-label "review:claude-required"
 
   security-scan:
-    if: startsWith(github.head_ref, 'agent/')
+    # Keep the security scan in lockstep with the review gate above so
+    # `codex/*` branches cannot bypass it (see issue #499).
+    if: startsWith(github.head_ref, 'agent/') || startsWith(github.head_ref, 'codex/')
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
