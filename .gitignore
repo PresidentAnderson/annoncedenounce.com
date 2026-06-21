@@ -4,3 +4,8 @@ npm-debug.log*
 
 # Local Claude Code state and agent memory
 .claude/
+
+# Autonomy loop scratch state (created per-run by autonomous-agent-loop.yml).
+# Must stay untracked: the loop rewrites .agent-workspace/issues-processed after
+# committing, and if it were tracked that dirty file would abort `git checkout main`.
+.agent-workspace/
