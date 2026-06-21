@@ -19,6 +19,8 @@
 
 This repo is powered by the **Sovereign Autonomy Pack** - enabling AI agents to process issues and implement features automatically.
 
+Agent behaviour and guardrails live in [`AGENTS.md`](AGENTS.md) (and [`AGENTS/CODEX_AUTONOMOUS_INSTRUCTIONS.md`](AGENTS/CODEX_AUTONOMOUS_INSTRUCTIONS.md) for the loop). For how to authenticate Codex on your ChatGPT subscription (preferred) vs. an API key (CI/fallback), see [`docs/CODEX_AUTH.md`](docs/CODEX_AUTH.md).
+
 ### Quick Commands
 
 ```bash
@@ -73,7 +75,7 @@ Add these to repo Settings → Secrets → Actions:
 
 | Secret | Description |
 |--------|-------------|
-| `OPENAI_API_KEY` | OpenAI API key for Codex agent |
+| `OPENAI_API_KEY` | OpenAI API key for the Codex agent in **CI/headless** runs. Day-to-day Codex work should run on your ChatGPT subscription instead — see [`docs/CODEX_AUTH.md`](docs/CODEX_AUTH.md). |
 | `ANTHROPIC_API_KEY` | Anthropic API key for Claude agent |
 | `RELEASE_TOKEN` | _Optional._ Fine-grained PAT (`contents:write` + `pull-requests:write`) enabling CI + auto-merge on release PRs from **Auto Version Bump** |
 
