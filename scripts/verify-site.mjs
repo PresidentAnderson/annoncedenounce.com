@@ -118,6 +118,57 @@ function verifyVersionApi() {
   assert.ok(Number.isInteger(body.revision), "/api/version must expose numeric revision");
 }
 
+async function verifyHealthApi() {
+  const handler = require("../api/health.js");
+
+  function makeRes() {
+    const headers = {};
+    return {
+      statusCode: 0,
+      body: null,
+      headersSent: false,
+      setHeader(name, value) {
+        headers[name.toLowerCase()] = value;
+      },
+      getHeader(name) {
+        return headers[name.toLowerCase()];
+      },
+      status(code) {
+        this.statusCode = code;
+        this.headersSent = true;
+        return this;
+      },
+      json(payload) {
+        this.body = payload;
+        return this;
+      },
+    };
+  }
+
+  // Healthy probe.
+  const okRes = makeRes();
+  await handler({ url: "/api/health" }, okRes);
+  assert.equal(okRes.statusCode, 200, "/api/health must return HTTP 200 when healthy");
+  assert.equal(okRes.body.status, "ok", "/api/health must report status ok");
+  assert.ok(okRes.getHeader("cache-control")?.includes("no-store"), "/api/health must disable caching");
+
+  // Synthetic-error probe must surface a 500 (alert dispatch happens inside).
+  const errRes = makeRes();
+  await handler({ url: "/api/health?synthetic=error" }, errRes);
+  assert.equal(errRes.statusCode, 500, "/api/health?synthetic=error must return HTTP 500");
+  assert.equal(errRes.body.status, "error", "/api/health synthetic error must report status error");
+}
+
+function verifyErrorReporter() {
+  const { parseSentryDsn } = require("../api/_lib/report-error.js");
+  const parsed = parseSentryDsn("https://abc123@o42.ingest.sentry.io/99");
+  assert.ok(parsed, "parseSentryDsn must parse a valid DSN");
+  assert.equal(parsed.publicKey, "abc123", "DSN public key must be extracted");
+  assert.equal(parsed.projectId, "99", "DSN project id must be extracted");
+  assert.ok(parsed.endpoint.endsWith("/api/99/store/"), "DSN store endpoint must be derived");
+  assert.equal(parseSentryDsn("not a dsn"), null, "parseSentryDsn must reject malformed input");
+}
+
 function verifyFilesAndVersion() {
   const pkg = readJson("package.json");
   const version = readJson("version.json");
@@ -159,7 +210,10 @@ function verifyFilesAndVersion() {
     ".github/workflows/ci.yml",
     ".github/workflows/auto-version-bump.yml",
     ".github/workflows/tag-release.yml",
+    ".github/workflows/uptime.yml",
     "api/version.js",
+    "api/health.js",
+    "api/_lib/report-error.js",
     "assets/favicon.png",
     "assets/hero-dossier.png",
     "robots.txt",
@@ -175,6 +229,8 @@ function verifyFilesAndVersion() {
 
 verifyFilesAndVersion();
 verifyVersionApi();
+verifyErrorReporter();
+await verifyHealthApi();
 await verifyStaticServer();
 
 console.log("verify-site: ok");

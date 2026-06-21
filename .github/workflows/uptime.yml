@@ -1,0 +1,97 @@
+name: Uptime
+
+# Synthetic uptime checks for the production site's key endpoints.
+# On any failure it fires a real alert: an ALERT_WEBHOOK_URL (Slack-compatible)
+# POST when the secret is set, plus a deduplicated GitHub issue so the signal is
+# never lost. Manually dispatchable for on-demand probes.
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: "Base URL to probe"
+        required: false
+        default: "https://annoncedenounce.com"
+
+concurrency:
+  group: uptime
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  probe:
+    name: Probe key endpoints
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      BASE_URL: ${{ inputs.base_url || 'https://annoncedenounce.com' }}
+      ALERT_WEBHOOK_URL: ${{ secrets.ALERT_WEBHOOK_URL }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Probe endpoints
+        id: probe
+        run: |
+          set -uo pipefail
+          BASE="${BASE_URL%/}"
+          # path<TAB>min-acceptable-status ranges treated as up: 200-399
+          PATHS=("/" "/api/version" "/api/health" "/privacy" "/sitemap.xml" "/robots.txt")
+          FAILURES=""
+          for path in "${PATHS[@]}"; do
+            url="${BASE}${path}"
+            code=$(curl -sS -o /dev/null -w '%{http_code}' --max-time 20 --retry 2 --retry-delay 3 "$url" || echo "000")
+            echo "$url -> $code"
+            if [ "$code" -lt 200 ] || [ "$code" -ge 400 ]; then
+              FAILURES="${FAILURES}- ${url} returned HTTP ${code}"$'\n'
+            fi
+          done
+          if [ -n "$FAILURES" ]; then
+            echo "down=true" >> "$GITHUB_OUTPUT"
+            {
+              echo "report<<EOF"
+              printf '%s' "$FAILURES"
+              echo "EOF"
+            } >> "$GITHUB_OUTPUT"
+          else
+            echo "down=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Send webhook alert
+        if: steps.probe.outputs.down == 'true' && env.ALERT_WEBHOOK_URL != ''
+        env:
+          REPORT: ${{ steps.probe.outputs.report }}
+        run: |
+          set -euo pipefail
+          TEXT=$(printf '🚨 Uptime alert — %s\n%s' "$BASE_URL" "$REPORT")
+          curl -sS -X POST -H 'Content-Type: application/json' \
+            --data "$(jq -n --arg t "$TEXT" '{text:$t}')" \
+            "$ALERT_WEBHOOK_URL"
+
+      - name: Open or update tracking issue
+        if: steps.probe.outputs.down == 'true'
+        env:
+          REPORT: ${{ steps.probe.outputs.report }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          gh label create uptime --color B60205 --description "Uptime check failures" 2>/dev/null || true
+          TITLE="Uptime alert: endpoint(s) down"
+          BODY=$(printf 'Automated uptime check detected failing endpoint(s) on %s:\n\n%s\nRun: %s' "$BASE_URL" "$REPORT" "$RUN_URL")
+          EXISTING=$(gh issue list --state open --label uptime --search "$TITLE in:title" --json number --jq '.[0].number' || echo "")
+          if [ -n "$EXISTING" ]; then
+            gh issue comment "$EXISTING" --body "$BODY"
+          else
+            gh issue create --title "$TITLE" --label uptime --body "$BODY"
+          fi
+
+      - name: Fail the run on outage
+        if: steps.probe.outputs.down == 'true'
+        run: |
+          echo "::error::One or more endpoints are down — see job log and alert channels."
+          exit 1

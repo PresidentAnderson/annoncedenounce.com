@@ -9,6 +9,10 @@
     "api/version.js": {
       "memory": 128,
       "maxDuration": 5
+    },
+    "api/health.js": {
+      "memory": 128,
+      "maxDuration": 5
     }
   },
   "redirects": [
@@ -49,6 +53,12 @@
     },
     {
       "source": "/api/version",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store, no-cache, must-revalidate, max-age=0" }
+      ]
+    },
+    {
+      "source": "/api/health",
       "headers": [
         { "key": "Cache-Control", "value": "no-store, no-cache, must-revalidate, max-age=0" }
       ]

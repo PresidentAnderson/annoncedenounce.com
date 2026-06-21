@@ -41,7 +41,7 @@ npm ci
 npm run verify
 ```
 
-The verifier checks version metadata, key static assets, the `/api/version` handler, workflow/canon files, and local static serving.
+The verifier checks version metadata, key static assets, the `/api/version` and `/api/health` handlers, the error-reporter module, workflow/canon files, and local static serving.
 
 Version metadata is controlled by:
 
@@ -76,6 +76,31 @@ Add these to repo Settings → Secrets → Actions:
 | `OPENAI_API_KEY` | OpenAI API key for Codex agent |
 | `ANTHROPIC_API_KEY` | Anthropic API key for Claude agent |
 | `RELEASE_TOKEN` | _Optional._ Fine-grained PAT (`contents:write` + `pull-requests:write`) enabling CI + auto-merge on release PRs from **Auto Version Bump** |
+| `ALERT_WEBHOOK_URL` | _Optional._ Slack-compatible incoming webhook. Used by the **Uptime** workflow for outage alerts; also read at runtime by the API routes for error alerts (set it in Vercel project env too). |
+| `SENTRY_DSN` | _Optional, Vercel env._ Sentry DSN. When set, API-route exceptions are forwarded to Sentry (no SDK/bundle required). |
+
+## Monitoring & Alerting
+
+Uptime and error alerting cover both the static pages and the serverless API
+routes.
+
+- **Error tracking** — `api/_lib/report-error.js` forwards any exception caught
+  in an API route to the configured channels: Sentry (`SENTRY_DSN`) and/or a
+  Slack-compatible webhook (`ALERT_WEBHOOK_URL`). With no env vars set it only
+  logs to the Vercel log stream, so nothing breaks locally. Wired into
+  `api/version.js` and `api/health.js`.
+- **Health endpoint** — `GET /api/health` returns `{ status: "ok", … }`.
+  `GET /api/health?synthetic=error` deliberately throws to exercise the full
+  alert pipeline end-to-end (returns HTTP 500 after dispatching the alert).
+- **Uptime checks** — `.github/workflows/uptime.yml` probes the home page,
+  `/api/version`, `/api/health`, `/privacy`, `/sitemap.xml`, and `/robots.txt`
+  every 15 minutes. On any failure it POSTs to `ALERT_WEBHOOK_URL` (when set),
+  opens/updates a deduplicated `uptime`-labelled issue, and fails the run.
+  Run on demand: `gh workflow run uptime.yml`.
+
+Acceptance check: hit `https://annoncedenounce.com/api/health?synthetic=error`
+(a synthetic error fires an alert) and confirm a downed endpoint trips the
+Uptime workflow alert.
 
 ## Project Structure
 
@@ -92,7 +117,10 @@ Add these to repo Settings → Secrets → Actions:
 │   ├── favicon.png         # Site icon
 │   └── hero-dossier.png    # Local hero visual
 ├── api/
-│   └── version.js          # Vercel version endpoint
+│   ├── version.js          # Vercel version endpoint
+│   ├── health.js           # Health/uptime probe (+ synthetic-error path)
+│   └── _lib/
+│       └── report-error.js # Error reporter → Sentry / alert webhook
 ├── scripts/
 │   ├── bump-version.mjs    # Semver + revision bump
 │   └── verify-site.mjs     # Static site verification gate
@@ -108,7 +136,8 @@ Add these to repo Settings → Secrets → Actions:
         ├── auto-version-bump.yml          # Manual release bump (opens auto-merging PR)
         ├── tag-release.yml                # Tags vX.Y.Z + GitHub Release on merge
         ├── autonomous-agent-loop.yml      # Manual agent workflow (workflow_dispatch only)
-        └── autonomy-pr-review-gate.yml    # PR review automation
+        ├── autonomy-pr-review-gate.yml    # PR review automation
+        └── uptime.yml                     # Scheduled uptime checks + outage alerts
 ```
 
 ## Lead Capture
