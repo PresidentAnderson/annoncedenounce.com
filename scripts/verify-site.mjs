@@ -118,6 +118,45 @@ function verifyVersionApi() {
   assert.ok(Number.isInteger(body.revision), "/api/version must expose numeric revision");
 }
 
+// Edition-jurisdiction-purity guard (issue #442, child of #416).
+// This is the Quebec (fr_CA) edition: the visitor-facing funnel copy must stay
+// jurisdiction-pure and use Quebec-French (OQLF) vocabulary. We strip non-visible
+// content (script/style blocks, HTML comments) so technical identifiers such as
+// CSS class "copy-mail" or code comments mentioning "cookie" are not flagged.
+function visibleCopy(html) {
+  return html
+    .replace(/<script[\s\S]*?<\/script>/gi, " ")
+    .replace(/<style[\s\S]*?<\/style>/gi, " ")
+    .replace(/<!--[\s\S]*?-->/g, " ");
+}
+
+function verifyEditionPurity(html) {
+  // 1. The edition must declare the Quebec locale, not a foreign one.
+  assert.ok(html.includes('<html lang="fr">'), "edition purity: page language must be French (fr)");
+  assert.ok(
+    html.includes('content="fr_CA"'),
+    "edition purity: og:locale must be fr_CA (Quebec edition)"
+  );
+
+  const copy = visibleCopy(html);
+
+  // 2. Visitor-facing funnel copy must not surface cross-edition vocabulary.
+  // Each entry: a foreign/international term that must NOT appear in visible copy,
+  // and the Quebec-French term that replaces it.
+  const forbiddenInCopy = [
+    [/\bcookies?\b/i, "use the Quebec term \"temoin(s)\" instead of \"cookie(s)\""],
+    [/\bspam\b/i, "use the Quebec term \"pourriel\" instead of \"spam\""],
+    [/\bnewsletter\b/i, "use \"infolettre\"/\"liste de lancement\" instead of \"newsletter\""],
+    [/\bcourrier[\s-]?electronique\b/i, "use the Quebec term \"courriel\""],
+  ];
+  for (const [pattern, guidance] of forbiddenInCopy) {
+    assert.ok(
+      !pattern.test(copy),
+      `edition purity: visible funnel copy must stay Quebec-pure — ${guidance}`
+    );
+  }
+}
+
 function verifyFilesAndVersion() {
   const pkg = readJson("package.json");
   const version = readJson("version.json");
@@ -140,6 +179,8 @@ function verifyFilesAndVersion() {
   assert.ok(html.includes('rel="manifest"'), "web manifest link must exist");
   assert.ok(!html.includes("A new version of the site is available"), "version banner must be localized (no English copy)");
   assert.ok(!/TODO|placeholder text|IMPLEMENTATION_\d+/.test(html), "index.html must not ship placeholders");
+
+  verifyEditionPurity(html);
 
   const vercel = readJson("vercel.json");
   assert.ok(Array.isArray(vercel.headers), "vercel.json must define response headers");
