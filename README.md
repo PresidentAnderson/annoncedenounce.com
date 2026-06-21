@@ -97,7 +97,8 @@ Add these to repo Settings → Secrets → Actions:
 │   ├── bump-version.mjs    # Semver + revision bump
 │   └── verify-site.mjs     # Static site verification gate
 ├── docs/
-│   └── OPERATING_CANON.md  # Repo operating procedure
+│   ├── OPERATING_CANON.md     # Repo operating procedure
+│   └── EDITION-LAUNCH-GATE.md # Per-edition launch-gate template
 ├── canon.lock.yaml         # Canon/source lock
 ├── vercel.json             # Vercel config
 ├── autonomy.defaults.yml   # Agent configuration

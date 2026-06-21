@@ -50,6 +50,8 @@ Autonomous agents may work only through issues that have:
 
 Changes touching auth, evidence, moderation, legal pages, privacy, right-of-reply, takedown handling, or publication rules require human/legal review before merge. Agents can prepare the work; they do not decide the legal posture.
 
+Activating a new jurisdiction / market edition follows the reusable Definition-of-Done in `docs/EDITION-LAUNCH-GATE.md` — legal review, native-language review, content provenance, allow-list, and edition-purity must all pass before the live flag is flipped through a single audited path.
+
 ## Product Safety Principles
 
 The platform is evidence-first, not pile-on-first:
